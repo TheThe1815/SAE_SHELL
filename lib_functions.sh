@@ -117,12 +117,69 @@ print_books() {
     done
 }
 
+total_books() {
+    local cpt_emprunts=$(wc -l < "emprunts.csv")
+    local cpt_livres=$(wc -l < "books.csv")
+
+    local nb_livres=$((cpt_emprunts+cpt_livres - 2))
+
+    echo "Nombre total de livres dans la bibliothèque : $nb_livres dont $cpt_emprunts empruntés."
+}
+
+number_books_by_gender() {
+    file="books.csv"
+
+    local data_autors=$(tr -s ' ' "$file" | cut -d',' -f5  | grep -v "^Genre$" | sort | uniq -C)
+
+    while read count genre
+    do
+        printf "%s [%s] : " "$genre" "$count"
+        
+        for ((i=0; i<$count; i++)); do
+            printf "#"
+        done
+        
+        printf "\n"
+
+    done <<< "$data_gender" 
+}
+
+top_5_authors() {
+    file="books.csv"
+
+    local cpt=0
+    local data_autors=$(tr -s ' ' "$file" | cut -d',' -f3  | grep -v "^Auteur$" | sort -nr | uniq -C)
+
+    while read count auteur
+    do 
+        printf "Avec %s livres : %s \n" "$auteur" "$count"
+
+        ((cpt++))
+        if [ $cpt -eq 5 ] then break
+    done <<< "$data_gender" 
+}
+
+books_by_decades() {
+    file="books.csv"
+
+    local data_years=$(tr -s ' ' "$file" | cut -d',' -f4  | grep -v "^Annee$" | sort | uniq -C)
+    local cpt=0
+
+    while read count annee
+    do
+        if [ $((annee%2))==0 && $(echo $annee | rev | cut -c1 | rev)==0 ] 
+            ((cpt += count))
+            then echo "$annee : $cpt"
+            let cpt=0
+        else cpt += count
+    done <<< "$data_years"
+}
 
 
 # Exemple d'utilisation (à décommenter pour tester)
- add_book "Mon Livre" "Moi" "2020" "SF" 
- add_book "bible" "appotre" "50" "SF" 
- add_book "bible" "appotre" "50" "SF" 
- modify_book "Mon Livre" "Nouveau Titre" "Moi" "2021" "Policier" "Emprunté"
- delbook "Nouveau Titre"
- print_books
+add_book "Mon Livre" "Moi" "2020" "SF" 
+add_book "bible" "appotre" "50" "SF" 
+add_book "bible" "appotre" "50" "SF" 
+modify_book "Mon Livre" "Nouveau Titre" "Moi" "2021" "Policier" "Emprunté"
+delbook "Nouveau Titre"
+print_books
