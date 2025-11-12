@@ -117,6 +117,7 @@ print_books() {
     done
 }
 
+<<<<<<< HEAD
 total_books() {
     local cpt_emprunts=$(wc -l < "emprunts.csv")
     local cpt_livres=$(wc -l < "books.csv")
@@ -174,7 +175,74 @@ books_by_decades() {
         else cpt += count
     done <<< "$data_years"
 }
+=======
+afficheLivre() {
+    local id_r="$1"
+>>>>>>> 80e22b324a0ba73a6eb9879718965ebb3884a510
 
+    if [ -z "$if_r" ]; then
+        echo "Erreur"
+        return 1
+    fi
+
+    local ligne
+    lignes=$(grep -E "^${id_r}," livres.csv)
+
+    [ -z "$lignes" ] &&  echo "Aucun livre avec l'ID $id_r" && return 1
+    
+
+    while IFS="," read -r id titre auteur annee genre statue; do
+        echo "-----------Livre-------------"
+        echo "--------ID : $id"
+        echo "--------Titre : $titre"
+        echo "--------Auteur : $auteur"
+        echo "--------Année : $annee"
+        echo "--------Genre : $genre"
+        echo "--------Statue : $statue"
+        echo "-----------------------------"
+    done < "$lignes"
+}
+
+searchTitle() {
+    read -p "Entrez un titre pour la recherche : " motcle
+
+    #on enleve tous les espaces inutiles
+    motcle=$(echo "$motcle" | tr -s ' ')
+
+    #si le titre est vide
+    [ -z "$motcle" ] && echo "Un titre ne peut pas etre vide nonuche" && return
+    
+
+    lignes=$(grep -i "$motcle" livres.csv | tr -s ' ' | cut -d',' -f1,2)
+
+    #si il n'y a aucun titre
+    [ -z "$lignes" ] && echo "Aucun titre correspondant" && return
+
+    #affichage des lignes qui contiennent le titre
+    echo "$lignes" | while IFS=',' read -r id titre; do
+        afficheLivre "$id"
+    done
+}
+
+searchAuthor(){
+    read -p "Entrez un auteur pour la recherche : " motcle
+
+    #on enleve tous les espaces inutiles
+    motcle=$(echo "$motcle" | tr -s ' ')
+
+    #si l'auteur est vide
+    [ -z "$motcle" ] && echo "Un auteur ne peut pas etre vide nonuche" && return
+    
+    lignes=$(grep -i "$motcle" livres.csv | tr -s ' ' | cut -d',' -f1,3)
+
+    #si il n'y a aucun auteur
+    [ -z "$lignes" ] && echo "Aucun auteur correspondant" && return
+
+    #affichage des lignes qui contiennent l'auteur
+    echo "$lignes" | while IFS=',' read -r id auteur; do
+        afficheLivre "$id"
+    done
+}
 
 # Exemple d'utilisation (à décommenter pour tester)
 add_book "Mon Livre" "Moi" "2020" "SF" 
