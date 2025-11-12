@@ -1,0 +1,25 @@
+001|1984|George Orwell|1949|Dystopie|disponible
+002|Le Meilleur des mondes|Aldous Huxley|1932|Dystopie|disponible
+003|Fahrenheit 451|Ray Bradbury|1953|Science-fiction|emprunté
+004|La Peste|Albert Camus|1947|Philosophie|disponible
+005|L'Étranger|Albert Camus|1942|Philosophie|disponible
+006|Les Misérables|Victor Hugo|1862|Roman historique|disponible
+007|Notre-Dame de Paris|Victor Hugo|1831|Roman historique|disponible
+008|Harry Potter à l'école des sorciers|J.K. Rowling|1997|Fantasy|disponible
+009|Harry Potter et la Chambre des secrets|J.K. Rowling|1998|Fantasy|emprunté
+010|Le Seigneur des Anneaux|J.R.R. Tolkien|1954|Fantasy|disponible
+011|Le Hobbit|J.R.R. Tolkien|1937|Fantasy|disponible
+012|Dune|Frank Herbert|1965|Science-fiction|disponible
+013|Fondation|Isaac Asimov|1951|Science-fiction|disponible
+014|Les Robots|Isaac Asimov|1950|Science-fiction|disponible
+015|Le Petit Prince|Antoine de Saint-Exupéry|1943|Conte|disponible
+016|Voyage au centre de la Terre|Jules Verne|1864|Aventure|disponible
+017|Vingt mille lieues sous les mers|Jules Verne|1870|Aventure|disponible
+018|Le Comte de Monte-Cristo|Alexandre Dumas|1844|Roman historique|disponible
+019|Les Trois Mousquetaires|Alexandre Dumas|1844|Roman historique|disponible
+020|Orgueil et Préjugés|Jane Austen|1813|Roman|disponible
+021|Jane Eyre|Charlotte Brontë|1847|Roman|disponible
+022|Dracula|Bram Stoker|1897|Horreur|disponible
+023|Frankenstein|Mary Shelley|1818|Horreur|disponible
+024|L'Alchimiste|Paulo Coelho|1988|Philosophie|disponible
+025|Sapiens : Une brève histoire de l'humanité|Yuval Noah Harari|2011|Essai|disponible
