@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# ----------------------- Gestion des livres -----------------------
+
 # Vérifie ou crée le fichier CSV
 csv_existe() {
     if [ ! -e "books.csv" ]; then
@@ -11,9 +13,7 @@ csv_existe() {
 }
 
 # Ajoute un livre
-add_book() {
-   
-    
+add_book() {    
     local titre="$1"
     local auteur="$2"
     local annee="$3"
@@ -21,21 +21,21 @@ add_book() {
     csv_existe
    
     local id=$(wc -l books.csv | cut -d' ' -f1 | tr -s " " )
-    if ! [[ "$3" =~ ^[0-9]{1,4}$ ]] || [ "$3" -gt $(date +%Y) ]; then
+    if ! [[ "$annee" =~ ^[0-9]{1,4}$ ]] || [ "$annee" -gt "$(date +%Y)" ]; then
         echo "Erreur : L'année n'est pas valide."
         return  1
     fi
 
-    if [ $(grep -q "$1" books.csv| wc -c ) -eq 0 ];
-        then 
-            echo "Livre deja existant"
-            return  1
+    # Vérifie si le livre existe (match exact du titre dans la colonne Titre)
+    if grep -q ",$titre," books.csv; then
+        echo "Livre deja existant"
+        return  1
     fi
     echo "$id,$titre,$auteur,$annee,$genre,disponible" >> "books.csv"
     echo "Livre '$titre' ajouté avec succès."
 }
 
-# Modifie un livre
+# Modifie un livre par son titre
 modify_book() {
     local titre="$1"
     local ntitre="$2"
@@ -73,6 +73,7 @@ delbook() {
     echo "Livre '$titre' supprimé avec succès."
 }
 
+# Affiche les livres avec pagination
 print_books() {
     local page=1
     local per_page=5
@@ -117,7 +118,123 @@ print_books() {
     done
 }
 
-<<<<<<< HEAD
+# ----------------------- Recherche et filtres -----------------------
+
+# Affiche les informations d'un livre donné avec son ID
+afficheLivre() {
+    local id_r="$1"
+
+    if [ -z "$id_r" ]; then
+        echo "Erreur"
+        return 1
+    fi
+
+    local lignes
+    lignes=$(grep -E "^${id_r}," books.csv)
+
+    [ -z "$lignes" ] &&  echo "Aucun livre avec l'ID $id_r" && return 1
+    
+
+    while IFS="," read -r id titre auteur annee genre statut; do
+        echo "-----------Livre-------------"
+        echo "--------ID : $id"
+        echo "--------Titre : $titre"
+        echo "--------Auteur : $auteur"
+        echo "--------Année : $annee"
+        echo "--------Genre : $genre"
+        echo "--------Statut : $statut"
+        echo "-----------------------------"
+    done <<< "$lignes"
+}
+
+# Recherche de livre par titre
+searchTitle() {
+    read -p "Entrez un titre pour la recherche : " motcle
+
+    #on enleve tous les espaces inutiles
+    motcle=$(echo "$motcle" | tr -s ' ')
+
+    #si le titre est vide
+    [ -z "$motcle" ] && echo "Un titre ne peut pas etre vide nonuche" && return
+    
+
+    lignes=$(grep -i "$motcle" books.csv | tr -s ' ' | cut -d',' -f1,2)
+
+    #si il n'y a aucun titre
+    [ -z "$lignes" ] && echo "Aucun titre correspondant" && return
+
+    #affichage des lignes qui contiennent le titre
+    echo "$lignes" | while IFS=',' read -r id titre; do
+        afficheLivre "$id"
+    done
+}
+
+# Recherche de livre par auteur
+searchAuthor(){
+    read -p "Entrez un auteur pour la recherche : " motcle
+
+    #on enleve tous les espaces inutiles
+    motcle=$(echo "$motcle" | tr -s ' ')
+
+    #si l'auteur est vide
+    [ -z "$motcle" ] && echo "Un auteur ne peut pas etre vide nonuche" && return
+    
+    lignes=$(grep -i "$motcle" books.csv | tr -s ' ' | cut -d',' -f1,3)
+
+    #si il n'y a aucun auteur
+    [ -z "$lignes" ] && echo "Aucun auteur correspondant" && return
+
+    #affichage des lignes qui contiennent l'auteur
+    echo "$lignes" | while IFS=',' read -r id auteur; do
+        afficheLivre "$id"
+    done
+}
+
+# Recherche de livre par genre
+searchGender(){
+    read -p "Entrez un genre pour la recherche (...): " motcle
+
+    #on enleve tous les espaces inutiles
+    motcle=$(echo "$motcle" | tr -s ' ')
+
+    #si le genre est vide
+    [ -z "$motcle" ] && echo "Un genre peut pas etre vide nonuche" && return
+
+    lignes=$(grep -i "$motcle" books.csv | tr -s ' ' | cut -d',' -f1,5)
+
+    #si il n'y a aucun 
+    [ -z "$lignes" ] && echo "Aucun genre correspondant" && return
+
+    #affichage des lignes qui contiennent le genre
+    echo "$lignes" | while IFS=',' read -r id genre; do
+        afficheLivre "$id"
+    done
+}
+
+# Recherche de livre par année
+searchYears(){
+    read -p "Entrez une année pour la recherche : " motcle
+
+    #on enleve tous les espaces inutiles
+    motcle=$(echo "$motcle" | tr -s ' ')
+
+    #si l'année est vide
+    [ -z "$motcle" ] && echo "Un annee peut pas etre vide nonuche" && return
+
+    lignes=$(grep -i "$motcle" books.csv | tr -s ' ' | cut -d',' -f1,4)
+
+    #si il n'y a aucun livre pour l'annee demander
+    [ -z "$lignes" ] && echo "Aucune année correspondante" && return
+
+    #affichage des lignes qui contiennent le genre
+    echo "$lignes" | while IFS=',' read -r id annee; do
+        afficheLivre "$id"
+    done
+}
+
+# ----------------------- Statistiques et Rapports -----------------------
+
+# Affiche le nombre total de livres et ceux empruntés
 total_books() {
     local cpt_emprunts=$(wc -l < "emprunts.csv")
     local cpt_livres=$(wc -l < "books.csv")
@@ -127,6 +244,7 @@ total_books() {
     echo "Nombre total de livres dans la bibliothèque : $nb_livres dont $cpt_emprunts empruntés."
 }
 
+# Affiche le nombre de livres par genre avec histogramme
 number_books_by_gender() {
     file="books.csv"
 
@@ -145,6 +263,7 @@ number_books_by_gender() {
     done <<< "$data_gender" 
 }
 
+# Affiche les 5 auteurs avec le plus de livres
 top_5_authors() {
     file="books.csv"
 
@@ -156,10 +275,13 @@ top_5_authors() {
         printf "Avec %s livres : %s \n" "$auteur" "$count"
 
         ((cpt++))
-        if [ $cpt -eq 5 ] then break
+        if [ $cpt -eq 5 ]; then 
+            break 
+        fi
     done <<< "$data_gender" 
 }
 
+# Affiche le nombre de livres publiés par décennie
 books_by_decades() {
     file="books.csv"
 
@@ -173,81 +295,26 @@ books_by_decades() {
             then echo "$annee : $cpt"
             let cpt=0
         else cpt += count
+        fi
     done <<< "$data_years"
 }
-=======
-afficheLivre() {
-    local id_r="$1"
->>>>>>> 80e22b324a0ba73a6eb9879718965ebb3884a510
 
-    if [ -z "$if_r" ]; then
-        echo "Erreur"
-        return 1
-    fi
-
-    local ligne
-    lignes=$(grep -E "^${id_r}," livres.csv)
-
-    [ -z "$lignes" ] &&  echo "Aucun livre avec l'ID $id_r" && return 1
-    
-
-    while IFS="," read -r id titre auteur annee genre statue; do
-        echo "-----------Livre-------------"
-        echo "--------ID : $id"
-        echo "--------Titre : $titre"
-        echo "--------Auteur : $auteur"
-        echo "--------Année : $annee"
-        echo "--------Genre : $genre"
-        echo "--------Statue : $statue"
-        echo "-----------------------------"
-    done < "$lignes"
-}
-
-searchTitle() {
-    read -p "Entrez un titre pour la recherche : " motcle
-
-    #on enleve tous les espaces inutiles
-    motcle=$(echo "$motcle" | tr -s ' ')
-
-    #si le titre est vide
-    [ -z "$motcle" ] && echo "Un titre ne peut pas etre vide nonuche" && return
-    
-
-    lignes=$(grep -i "$motcle" livres.csv | tr -s ' ' | cut -d',' -f1,2)
-
-    #si il n'y a aucun titre
-    [ -z "$lignes" ] && echo "Aucun titre correspondant" && return
-
-    #affichage des lignes qui contiennent le titre
-    echo "$lignes" | while IFS=',' read -r id titre; do
-        afficheLivre "$id"
-    done
-}
-
-searchAuthor(){
-    read -p "Entrez un auteur pour la recherche : " motcle
-
-    #on enleve tous les espaces inutiles
-    motcle=$(echo "$motcle" | tr -s ' ')
-
-    #si l'auteur est vide
-    [ -z "$motcle" ] && echo "Un auteur ne peut pas etre vide nonuche" && return
-    
-    lignes=$(grep -i "$motcle" livres.csv | tr -s ' ' | cut -d',' -f1,3)
-
-    #si il n'y a aucun auteur
-    [ -z "$lignes" ] && echo "Aucun auteur correspondant" && return
-
-    #affichage des lignes qui contiennent l'auteur
-    echo "$lignes" | while IFS=',' read -r id auteur; do
-        afficheLivre "$id"
-    done
-}
-
-# Exemple d'utilisation (à décommenter pour tester)
-add_book "Mon Livre" "Moi" "2020" "SF" 
+# Tests des fonctions
+add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
 add_book "bible" "appotre" "50" "SF" 
-add_book "bible" "appotre" "50" "SF" 
-modify_book "Mon Livre" "Nouveau Titre" "Moi" "2021" "Policier" "Emprunté"
-delbook "Nouveau Titre"
-print_books
+add_book "bible" "appotre" "50" "SF"  
+modify_book "Le Petit Prince" "Le Petit Prince" "Antoine de Saint-Exupéry" "1943" "Conte" "emprunté" #marche mais sensible aux espaces et a la casse donc pas ouf
+#sleep 1
+delbook "bible" #marche
+#print_books #marche pas
+
+#searchTitle #marche mais recherche pas uniquement dans le titre (ex : pour 1984, le livre ayant le titre 1984 et le livre datant de 1984 seront affichés)
+#searchAuthor #pareil
+#searchGender #pareil
+#searchYears #pareil et ça doit rechercher les livres entre 2 années
+
+total_books #en soit ça marche mais les comptes sont pas bons kevin et je pense que on doit uniquement regarder dans books.csv 
+            #(car dans emprunts y'a pas que ceux actuels par ex si un livre a été emprunté 2 fois il comptera 2 fois, il faut regarder si statut=emprunté dans books)
+#number_books_by_gender #marche pas
+#top_5_authors #pareil
+books_by_decades #pareil

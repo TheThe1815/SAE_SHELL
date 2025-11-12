@@ -1,14 +1,45 @@
-# SAE_SHELL
-Membres du groupe : Camille Kasteleyn, Theo Hecquet, Fabien Lembre
+# SAE_SHELL : Système de Gestion de Bibliothèque Personnelle
+### Objectifs :
+ * Manipulation de fichiers texte  
+ * Gestion de données structurées sans base de données  
+ * Menu interactif et interface utilisateur  
+ * Fonctions de recherche et filtrage  
+### Description :
+ Créer un système complet de gestion de livres avec fichiers plats (CSV/texte).
+
+### Membres du groupe (Groupe TP C) : 
+ * Vincent Duriez  
+ * Camille Kasteleyn  
+ * Theo Hecquet  
+ * Fabien Lembre (22303886)
+
+## Répartition des tâches :
+
+### Partie de Vincent :
+**Partie gestion des livres :**  
+- *add_book()* : ajouter un livre avec génération automatique d'ID
+- *modify_book()* : modifier un livre existant
+- *delbook()* : supprimer un livre 
+- *print_books()* : lister tous les livres avec pagination
 
 ### Partie de Camille :
-
+**Partie recherche et filtres :**  
+- *searchTitle()* : rechercher par titre (recherche partielle)
+- *searchAuthor()* : rechercher par auteur
+- *searchGender()* : filtrer par genre
+- *searchYears()* : filtrer par année (plage de dates)
+- **PAS ENCORE FAIT** Recherche avancée (plusieurs critères combinés)
 
 ### Partie de Théo :
-
+**Partie statistiques et rapports :**  
+- *total_books()* : Nombre total de livres
+- *number_books_by_gender()* : Répartition par genre (graphique ASCII)
+- *top_5_authors()* : Top 5 auteurs les plus présents
+- *books_by_decades()* : Livres par décennie
+- **PAS ENCORE FAIT** Export des résultats en HTML ou PDF
 
 ### Partie de Fabien :
-
+**Partie Documentation, Livrables et Tests**
 
 
 ### Partie GPTo
