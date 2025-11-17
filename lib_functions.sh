@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #!/bin/bash
 
 # Vérifie ou crée le fichier CSV
@@ -118,7 +117,6 @@ print_books() {
     done
 }
 
-<<<<<<< HEAD
 total_books() {
     local cpt_emprunts=$(wc -l < "emprunts.csv")
     local cpt_livres=$(wc -l < "books.csv")
@@ -157,7 +155,8 @@ top_5_authors() {
         printf "Avec %s livres : %s \n" "$auteur" "$count"
 
         ((cpt++))
-        if [ $cpt -eq 5 ] then break
+        if [ $cpt -eq 5 ]; then break
+        fi
     done <<< "$data_gender" 
 }
 
@@ -169,19 +168,18 @@ books_by_decades() {
 
     while read count annee
     do
-        if [ $((annee%2))==0 && $(echo $annee | rev | cut -c1 | rev)==0 ] 
+        if [ $((annee%2))==0 && $(echo $annee | rev | cut -c1 | rev)==0 ];
             ((cpt += count))
             then echo "$annee : $cpt"
             let cpt=0
         else cpt += count
+        fi
     done <<< "$data_years"
 }
-=======
+
 afficheLivre() {
     local id_r="$1"
->>>>>>> 80e22b324a0ba73a6eb9879718965ebb3884a510
-
-    if [ -z "$if_r" ]; then
+    if [ -z "$id_r" ]; then
         echo "Erreur"
         return 1
     fi
@@ -419,7 +417,7 @@ searchTitle() {
     [ -z "$lignes" ] && echo "Aucun titre correspondant" && return
 
     #affichage des lignes qui contiennent le titre
-    echo "$lignes" | while IFS=',' read -r id titre; do
+    echo "$lignes" | while IFS=',' read -r id; do
         afficheLivre "$id"
     done
 }
@@ -483,6 +481,20 @@ searchYears(){
 
     #affichage des lignes qui contiennent le genre
     echo "$lignes" | while IFS=',' read -r id annee; do
+        afficheLivre "$id"
+    done
+}
+
+searchAll(){
+    read -p "Entrez des mots clé pour la recherche : " motscle
+    lignes=`tail -n +2 books.csv`
+    for mot in $motscle; do
+        lignes=`echo "$lignes" | grep -i "$mot"`
+    done
+
+    [ -z "$lignes" ] && echo "Aucun livre correspondant" && return
+
+    echo "$lignes" | while IFS=',' read -r id _; do
         afficheLivre "$id"
     done
 }
@@ -554,10 +566,63 @@ books_by_decades() {
     done <<< "$data_years"
 }
 
-# Tests des fonctions
-add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
+# ----------------------- Emprunts -----------------------
+
+emprunter_livre() {
+    read -p "Entrez l'ID du livre à emprunter : " id_livre
+    grep -q "^$id_livre," books.csv
+    if [ $? -ne 0 ]; then
+        echo "Livre avec ID $id_livre non trouvé."
+        return 1
+    fi
+    statut=`grep "^$id_livre," books.csv | cut -d',' -f6 | tr -d '\r'`
+    echo "Statut du livre : $statut"
+    if [ "$statut" = "emprunté" ]; then
+        echo "Le livre avec ID $id_livre est déjà emprunté."
+        return 1
+    fi
+    # Remplace "disponible" par "emprunté" pour ce livre dans books.csv
+    sed -i "/^$id_livre,/s/disponible/emprunté/" books.csv
+    read -p "Entrez le nom de l'emprunteur : " nom_emprunteur
+    date_emprunt=$(date +%Y-%m-%d)
+    read -p "Entrez la date de retour prévue (YYYY-MM-DD) : " date_retour 
+    if [[ ! "$date_retour" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+        echo "Format de date de retour invalide."
+        return 1
+    fi
+    # Vérifie que la date existe réellement
+    if ! date -d "$date_retour" "+%Y-%m-%d" >/dev/null 2>&1; then
+        echo "La date de retour n'existe pas."
+        return 1
+    fi
+    if [[ "$date_retour" < "$date_emprunt" ]]; then
+        echo "La date de retour doit être postérieure à la date d'emprunt."
+        return 1
+    fi
+    echo "$id_livre,$nom_emprunteur,$date_emprunt,$date_retour" >> emprunts.csv
+}
+
+retourner_livre() {
+    read -p "Entrez l'ID du livre à retourner : " id_livre
+    grep -q "^$id_livre," books.csv
+    if [ $? -ne 0 ]; then
+        echo "Livre avec ID $id_livre non trouvé."
+        return 1
+    fi
+    statut=`grep "^$id_livre," books.csv | cut -d',' -f6 | tr -d '\r'`
+    if [ "$statut" = "disponible" ]; then
+        echo "Le livre avec ID $id_livre n'est pas emprunté."
+        return 1
+    fi
+    # Remplace "emprunté" par "disponible" pour ce livre dans books.csv
+    sed -i "/^$id_livre,/s/emprunté/disponible/" books.csv
+}
+
+# ----------------------- Tests des fonctions -----------------------
+
 add_book "bible" "appotre" "50" "SF" 
-add_book "bible" "appotre" "50" "SF"  
+add_book "bible" "appotre" "50" "SF" 
+add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
 modify_book "Le Petit Prince" "Le Petit Prince" "Antoine de Saint-Exupéry" "1943" "Conte" "emprunté" #marche mais sensible aux espaces et a la casse donc pas ouf
 #sleep 1
 delbook "bible" #marche
@@ -567,13 +632,13 @@ delbook "bible" #marche
 #searchAuthor #pareil
 #searchGender #pareil
 #searchYears #pareil et ça doit rechercher les livres entre 2 années
+searchAll
 
 total_books #en soit ça marche mais les comptes sont pas bons kevin et je pense que on doit uniquement regarder dans books.csv 
             #(car dans emprunts y'a pas que ceux actuels par ex si un livre a été emprunté 2 fois il comptera 2 fois, il faut regarder si statut=emprunté dans books)
 #number_books_by_gender #marche pas
 #top_5_authors #pareil
-books_by_decades #pareil
->>>>>>> b6acfe2c8f9d04bf70c6bd87644f06559b575435
+#books_by_decades #pareil
 
-
-ceci est un test de theo
+emprunter_livre 
+retourner_livre
