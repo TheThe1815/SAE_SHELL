@@ -363,12 +363,12 @@ retourner_livre() {
 
 # ----------------------- Tests des fonctions -----------------------
 
-add_book "bible" "appotre" "-50" "SF" 
+add_book "bible" "appotre" "-50" "SF" #accepte desormais les annees negatives
 add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
 modify_book 100 "Le Petit Prince" "Antoine de Saint-Exupéry" "1943" "Conte" "emprunté" #marche mais sensible aux espaces et a la casse donc pas ouf
 sleep 1
 #delbook "bible" #marche
-#print_books #marche pas
+#print_books #fonctionne il fallait juste remplacer un 2 en 1 fab!
 
 #searchTitle #marche mais recherche pas uniquement dans le titre (ex : pour 1984, le livre ayant le titre 1984 et le livre datant de 1984 seront affichés)
 #searchAuthor #pareil
