@@ -21,7 +21,7 @@ add_book() {
     csv_existe
    
     local id=$(wc -l books.csv | cut -d' ' -f1 | tr -s " " )
-    if ! [[ "$annee" =~ ^-{0,1}[0-9]{1,4}$ ]] || [ "$annee" -gt "$(date +%Y)" ]; then
+    if ! [[ "$annee" =~ ^[0-9]{1,4}$ ]] || [ "$annee" -gt "$(date +%Y)" ]; then
         echo "Erreur : L'année n'est pas valide."
         return  1
     fi
@@ -35,23 +35,27 @@ add_book() {
     echo "Livre '$titre' ajouté avec succès."
 }
 
-# Modifie un livre par son id
+# Modifie un livre par son titre
 modify_book() {
-    local id="$1"
+    local titre="$1"
     local ntitre="$2"
     local nauteur="$3"
     local nannee="$4"
     local ngenre="$5"
     local nstatut="$6"
 
-    [ $( grep "^$id," books.csv | wc -l ) -lt 1 ] && echo -e "id invalid \n" && return 1
+    # Vérifie que le livre existe
+    if ! grep -q ",$titre," books.csv; then
+        echo "Erreur : Livre '$titre' non trouvé."
+        return  1
+    fi
 
-    # Construit la nouvelle ligne (on s'assure que les virgules sont bien placées)
-    local nouvelle_ligne="$id,$ntitre,$nauteur,$nannee,$ngenre,$nstatut"
+    # Construit la nouvelle ligne
+    local nouvelle_ligne="$(grep ",$titre," books.csv | cut -d, -f1),$ntitre,$nauteur,$nannee,$ngenre,$nstatut"
 
-    # Remplace la ligne correspondante
-    sed -i "/^$id,/c\\$nouvelle_ligne" books.csv
-    echo "Livre d'ID '$id' modifié avec succès."
+    # Remplace la ligne
+    sed -i "/,$titre,/c\\$nouvelle_ligne" books.csv
+    echo "Livre '$titre' modifié avec succès."
 }
 
 # Supprime un livre
@@ -85,7 +89,7 @@ print_books() {
         echo "--------------------------------------------------------------------------------"
 
         # Calcule les lignes à afficher
-        local start_line=$(( (page - 1) * per_page + 1 ))  # +2 pour sauter l'en-tête
+        local start_line=$(( (page - 1) * per_page + 2 ))  # +2 pour sauter l'en-tête
         local end_line=$(( start_line + per_page - 1 ))
 
         # Affiche les lignes de la page courante
@@ -249,8 +253,8 @@ total_books() {
     local cpt_emprunts=$(wc -l < "emprunts.csv")
     local cpt_livres=$(wc -l < "books.csv")
 
-    local nb_livres=$((cpt_emprunts+cpt_livres - 2))
-
+    ((cpt_livres--))
+    ((cpt_emprunts--))
     echo "Nombre total de livres dans la bibliothèque : $nb_livres dont $cpt_emprunts empruntés."
 }
 
@@ -275,42 +279,93 @@ top_5_authors() {
 }
 
 books_by_decades() {
-    file="books.csv"
+    echo "--- Par Décennies ---"
+    if [ ! -f "books.csv" ]; then echo "Fichier introuvable"; return; fi
 
-    local data_years=$(tr -s ' ' "$file" | cut -d',' -f4  | grep -v "^Annee$" | sort | uniq -C)
-    local cpt=0
-
-    while read count annee
-    do
-        if [ $((annee%2))==0 && $(echo $annee | rev | cut -c1 | rev)==0 ] 
-            ((cpt += count))
-            then echo "$annee : $cpt"
-            let cpt=0
-        else cpt += count
+    # Fichier temporaire pour le calcul
+    > decades.tmp
+    tail -n +2 "books.csv" | cut -d',' -f4 | while read annee; do
+        # Vérifie que l'année est bien un nombre avant de calculer
+        if [[ "$annee" =~ ^[0-9]+$ ]]; then
+            dec=$(( (annee / 10) * 10 ))
+            echo "$dec" >> decades.tmp
         fi
-    done <<< "$data_years"
+    done
+    
+    sort decades.tmp | uniq -c
+    rm decades.tmp
 }
 
-# Tests des fonctions
-add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
+# ----------------------- Emprunts -----------------------
+
+emprunter_livre() {
+    read -p "Entrez l'ID du livre à emprunter : " id_livre
+    grep -q "^$id_livre," books.csv
+    if [ $? -ne 0 ]; then
+        echo "Livre avec ID $id_livre non trouvé."
+        return 1
+    fi
+    statut=`grep "^$id_livre," books.csv | cut -d',' -f6 | tr -d '\r'`
+    echo "Statut du livre : $statut"
+    if [ "$statut" = "emprunté" ]; then
+        echo "Le livre avec ID $id_livre est déjà emprunté."
+        return 1
+    fi
+    # Remplace "disponible" par "emprunté" pour ce livre dans books.csv
+    sed -i "/^$id_livre,/s/disponible/emprunté/" books.csv
+    read -p "Entrez le nom de l'emprunteur : " nom_emprunteur
+    date_emprunt=$(date +%Y-%m-%d)
+    read -p "Entrez la date de retour prévue (YYYY-MM-DD) : " date_retour 
+    if [[ ! "$date_retour" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+        echo "Format de date de retour invalide."
+        return 1
+    fi
+    # Vérifie que la date existe réellement
+    if ! date -d "$date_retour" "+%Y-%m-%d" >/dev/null 2>&1; then
+        echo "La date de retour n'existe pas."
+        return 1
+    fi
+    if [[ "$date_retour" < "$date_emprunt" ]]; then
+        echo "La date de retour doit être postérieure à la date d'emprunt."
+        return 1
+    fi
+    echo "$id_livre,$nom_emprunteur,$date_emprunt,$date_retour" >> emprunts.csv
+}
+
+retourner_livre() {
+    read -p "Entrez l'ID du livre à retourner : " id_livre
+    grep -q "^$id_livre," books.csv
+    if [ $? -ne 0 ]; then
+        echo "Livre avec ID $id_livre non trouvé."
+        return 1
+    fi
+    statut=`grep "^$id_livre," books.csv | cut -d',' -f6 | tr -d '\r'`
+    if [ "$statut" = "disponible" ]; then
+        echo "Le livre avec ID $id_livre n'est pas emprunté."
+        return 1
+    fi
+    # Remplace "emprunté" par "disponible" pour ce livre dans books.csv
+    sed -i "/^$id_livre,/s/emprunté/disponible/" books.csv
+}
+
+# ----------------------- Tests des fonctions -----------------------
+
 add_book "bible" "appotre" "50" "SF" 
-add_book "bible" "appotre" "50" "SF"  
+add_book "bible" "appotre" "50" "SF" 
+add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
+
 modify_book "Le Petit Prince" "Le Petit Prince" "Antoine de Saint-Exupéry" "1943" "Conte" "emprunté" #marche mais sensible aux espaces et a la casse donc pas ouf
 #sleep 1
 delbook "bible" #marche
-#print_books #marche pas
+print_books 
 
 #searchTitle #marche mais recherche pas uniquement dans le titre (ex : pour 1984, le livre ayant le titre 1984 et le livre datant de 1984 seront affichés)
 #searchAuthor #pareil
 #searchGender #pareil
 #searchYears #pareil et ça doit rechercher les livres entre 2 années
+searchAll
 
-#total_books #en soit ça marche mais les comptes sont pas bons kevin et je pense que on doit uniquement regarder dans books.csv 
-            #(car dans emprunts y'a pas que ceux actuels par ex si un livre a été emprunté 2 fois il comptera 2 fois, il faut regarder si statut=emprunté dans books)
-#number_books_by_gender #marche pas
-#top_5_authors #pareil
-books_by_decades #pareil
->>>>>>> b6acfe2c8f9d04bf70c6bd87644f06559b575435
-
-
-ceci est un test de theo
+total_books #Marche maintenant 
+number_books_by_gender #Marche maintenant 
+top_5_authors #Marche maintenant 
+books_by_decades #Marche maintenant 
