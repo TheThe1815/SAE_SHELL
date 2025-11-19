@@ -348,15 +348,50 @@ retourner_livre() {
     sed -i "/^$id_livre,/s/emprunté/disponible/" books.csv
 }
 
+Livres_Empruntes() {
+    lignes=$(grep -i ",emprunté" books.csv)
+
+    #si il n'y a aucun titre
+    [ -z "$lignes" ] && echo "Aucun livre emprunté" && return
+
+    #affichage des lignes qui contiennent le titre
+    echo "$lignes" | while IFS=',' read -r id; do
+        afficheLivre "$id"
+    done
+}
+
+Livres_en_retard() {
+    local today=$(date +%Y-%m-%d)
+    if [ ! -f "emprunts.csv" ]; then
+        echo "Aucun emprunt enregistré."
+        return
+    fi
+
+    local lignes=$(tail -n +2 emprunts.csv | while IFS=',' read -r id_livre nom_emprunteur date_emprunt date_retour; do
+        [ "$date_retour" \< "$today" ] && echo "$id_livre"
+    done)
+
+    if [ -z "$lignes" ]; then
+        echo "Aucun livre en retard."
+        return
+    fi
+
+    echo "Livres en retard :"
+    for id in $lignes; do
+        afficheLivre "$id"
+    done
+}
+
+    
+
 # ----------------------- Tests des fonctions -----------------------
 
 add_book "bible" "appotre" "50" "SF" 
 add_book "bible" "appotre" "50" "SF" 
 add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
-
 modify_book "Le Petit Prince" "Le Petit Prince" "Antoine de Saint-Exupéry" "1943" "Conte" "emprunté" #marche mais sensible aux espaces et a la casse donc pas ouf
 #sleep 1
-delbook "bible" #marche
+delbook "bible" 
 print_books 
 
 #searchTitle #marche mais recherche pas uniquement dans le titre (ex : pour 1984, le livre ayant le titre 1984 et le livre datant de 1984 seront affichés)
@@ -369,3 +404,8 @@ total_books #Marche maintenant
 number_books_by_gender #Marche maintenant 
 top_5_authors #Marche maintenant 
 books_by_decades #Marche maintenant 
+
+emprunter_livre 
+retourner_livre
+Livres_Empruntes 
+Livres_en_retard
