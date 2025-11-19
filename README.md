@@ -9,8 +9,8 @@
 
 ### Membres du groupe (Groupe TP C) : 
  * Vincent Duriez (22300445)
- * Camille Kasteleyn  
- * Theo Hecquet  
+ * Camille Kasteleyn 
+ * Theo Hecquet (22204967)
  * Fabien Lembre (22303886)
 
 ## Répartition des tâches :
@@ -40,6 +40,12 @@
 
 ### Partie de Fabien :
 **Partie Documentation, Livrables et Tests**
+**Partie gestion des emprunts :**  
+- *emprunter_livre()* : Ajoute un emprunt dans emprunts.csv et met le statut du livre à *emprunté*
+- *retourner_livre()* : met le statut du livre à *rendu*
+- *Livres_Empruntes()* : 
+- *Livres_en_retard()* :
+- *Historique_emprunts()* :
 
 
 ### Partie GPTo
@@ -322,6 +328,3 @@ Interface web minimale (si autorisé).
 Ne pas verrouiller → perte de données si plusieurs accès.
 
 Ne pas gérer les accents/encoding → mauvaises recherches.
-
->>>>>>> b6acfe2c8f9d04bf70c6bd87644f06559b575435
-Supposer que tous les utilisateurs utilisent la même locale.

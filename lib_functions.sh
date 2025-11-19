@@ -45,13 +45,13 @@ modify_book() {
     local nstatut="$6"
 
     # Vérifie que le livre existe
-    if ! grep -q ",$titre," books.csv; then
+    if ! grep -qi ",$titre," books.csv; then
         echo "Erreur : Livre '$titre' non trouvé."
         return  1
     fi
 
     # Construit la nouvelle ligne
-    local nouvelle_ligne="$(grep ",$titre," books.csv | cut -d, -f1),$ntitre,$nauteur,$nannee,$ngenre,$nstatut"
+    local nouvelle_ligne="$(grep -i ",$titre," books.csv | cut -d, -f1),$ntitre,$nauteur,$nannee,$ngenre,$nstatut"
 
     # Remplace la ligne
     sed -i "/,$titre,/c\\$nouvelle_ligne" books.csv
@@ -63,13 +63,13 @@ delbook() {
     local titre="$1"
 
     # Vérifie que le livre existe
-    if ! grep -q ",$titre," books.csv; then
+    if ! grep -qi ",$titre," books.csv; then
         echo "Erreur : Livre '$titre' non trouvé."
         return  1
     fi
 
     # Supprime la ligne
-    grep -v ",$titre," books.csv > books.tmp && mv books.tmp books.csv
+    grep -vi ",$titre," books.csv > books.tmp && mv books.tmp books.csv
     echo "Livre '$titre' supprimé avec succès."
 }
 
@@ -255,7 +255,7 @@ total_books() {
 
     ((cpt_livres--))
     ((cpt_emprunts--))
-    echo "Nombre total de livres dans la bibliothèque : $nb_livres dont $cpt_emprunts empruntés."
+    echo "Nombre total de livres dans la bibliothèque : $cpt_livres dont $cpt_emprunts empruntés."
 }
 
 number_books_by_gender() {
@@ -299,23 +299,28 @@ books_by_decades() {
 # ----------------------- Emprunts -----------------------
 
 emprunter_livre() {
+    # demande l'ID du livre à emprunter
     read -p "Entrez l'ID du livre à emprunter : " id_livre
+    # Vérifie que le livre existe
     grep -q "^$id_livre," books.csv
     if [ $? -ne 0 ]; then
         echo "Livre avec ID $id_livre non trouvé."
         return 1
     fi
+    # Vérifie si le livre est déjà emprunté
     statut=`grep "^$id_livre," books.csv | cut -d',' -f6 | tr -d '\r'`
     echo "Statut du livre : $statut"
     if [ "$statut" = "emprunté" ]; then
         echo "Le livre avec ID $id_livre est déjà emprunté."
         return 1
     fi
-    # Remplace "disponible" par "emprunté" pour ce livre dans books.csv
-    sed -i "/^$id_livre,/s/disponible/emprunté/" books.csv
+
+    # demande le nom de l'emprunteur et la date de retour prévue
     read -p "Entrez le nom de l'emprunteur : " nom_emprunteur
-    date_emprunt=$(date +%Y-%m-%d)
+    date_emprunt=$(date +%Y-%m-%d) #date du jour
     read -p "Entrez la date de retour prévue (YYYY-MM-DD) : " date_retour 
+
+    # Vérifie le format de la date de retour
     if [[ ! "$date_retour" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
         echo "Format de date de retour invalide."
         return 1
@@ -325,71 +330,101 @@ emprunter_livre() {
         echo "La date de retour n'existe pas."
         return 1
     fi
+    # Vérifie que la date de retour est postérieure à la date d'emprunt
     if [[ "$date_retour" < "$date_emprunt" ]]; then
         echo "La date de retour doit être postérieure à la date d'emprunt."
         return 1
     fi
-    echo "$id_livre,$nom_emprunteur,$date_emprunt,$date_retour" >> emprunts.csv
+
+    # Remplace "disponible" par "emprunté" pour ce livre dans books.csv
+    sed -i "/^$id_livre,/s/disponible/emprunté/" books.csv
+    # Enregistre l'emprunt dans emprunts.csv
+    echo "$id_livre,$nom_emprunteur,$date_emprunt,$date_retour,emprunté" >> emprunts.csv
+    echo "Livre avec ID $id_livre emprunté à $nom_emprunteur avec succès."
 }
 
 retourner_livre() {
+    # demande l'ID du livre à retourner
     read -p "Entrez l'ID du livre à retourner : " id_livre
     grep -q "^$id_livre," books.csv
     if [ $? -ne 0 ]; then
         echo "Livre avec ID $id_livre non trouvé."
         return 1
     fi
+    # Vérifie si le livre est emprunté
     statut=`grep "^$id_livre," books.csv | cut -d',' -f6 | tr -d '\r'`
     if [ "$statut" = "disponible" ]; then
         echo "Le livre avec ID $id_livre n'est pas emprunté."
         return 1
     fi
-    # Remplace "emprunté" par "disponible" pour ce livre dans books.csv
+    # Remplace "emprunté" par "disponible" pour ce livre dans books.csv et par "rendu" dans emprunts.csv
     sed -i "/^$id_livre,/s/emprunté/disponible/" books.csv
+    sed -i "/^$id_livre,/s/emprunté/rendu/" books.csv 
+    echo "Livre avec ID $id_livre retourné avec succès."
 }
 
 Livres_Empruntes() {
+    #recherche des livres empruntés
     lignes=$(grep -i ",emprunté" books.csv)
 
-    #si il n'y a aucun titre
+    #si il n'y a aucun livres empruntés
     [ -z "$lignes" ] && echo "Aucun livre emprunté" && return
 
-    #affichage des lignes qui contiennent le titre
-    echo "$lignes" | while IFS=',' read -r id; do
+    #affichage des livres empruntés
+    echo "---------------- Livres empruntés : ----------------"
+    echo "$lignes" | while IFS=',' read -r id _; do
         afficheLivre "$id"
     done
 }
 
 Livres_en_retard() {
-    local today=$(date +%Y-%m-%d)
+    today=$(date +%Y-%m-%d)
     if [ ! -f "emprunts.csv" ]; then
         echo "Aucun emprunt enregistré."
         return
     fi
 
-    local lignes=$(tail -n +2 emprunts.csv | while IFS=',' read -r id_livre nom_emprunteur date_emprunt date_retour; do
-        [ "$date_retour" \< "$today" ] && echo "$id_livre"
-    done)
+    touch .livres_retard.tmp
+    echo "---------------- Livres empruntés en retard : ----------------"
+    #boucle sur chaque ligne d'emprunts.csv en vérifiant si le livre est en retard et emprunté
+    tail -n +2 emprunts.csv | while IFS=',' read -r id_livre nom_emprunteur date_emprunt date_retour statut; do
+        if [[ "$statut" = "emprunté" ]] && [[ "$date_retour" < "$today" ]]; then
+            echo -e "Ce livre aurait du être retourné par $nom_emprunteur avant le $date_retour :"
+            afficheLivre "$id_livre"
+            echo "$id_livre" >> .livres_retard.tmp
+        fi
+    done
 
-    if [ -z "$lignes" ]; then
+    if ! [ -s .livres_retard.tmp ]; then
         echo "Aucun livre en retard."
+    fi
+    rm -f .livres_retard.tmp
+}
+
+Historique_emprunts(){
+    if [ ! -f "emprunts.csv" ]; then
+        echo "Aucun emprunt enregistré."
         return
     fi
 
-    echo "Livres en retard :"
-    for id in $lignes; do
-        afficheLivre "$id"
+    echo "---------------- Historique des emprunts : ----------------"
+    tail -n +2 emprunts.csv | while IFS=',' read -r id_livre nom_emprunteur date_emprunt date_retour statut ; do
+        if [ "$statut" = "emprunté" ]; then
+            echo "- Emprunt du livre "$id_livre" par "$nom_emprunteur" le "$date_emprunt" à rendre avant le "$date_retour" inclus."
+        else
+            echo "- Emprunt du livre "$id_livre" par "$nom_emprunteur" le "$date_emprunt" rendu avant le "$date_retour" inclus."
+        fi
     done
 }
 
-    
 
 # ----------------------- Tests des fonctions -----------------------
 
+delbook "mon livre"
 add_book "bible" "appotre" "50" "SF" 
 add_book "bible" "appotre" "50" "SF" 
 add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
-modify_book "Le Petit Prince" "Le Petit Prince" "Antoine de Saint-Exupéry" "1943" "Conte" "emprunté" #marche mais sensible aux espaces et a la casse donc pas ouf
+modify_book "mon Livre" "Mon livre" "Toi" "2025" "Roman" #marche mais sensible aux espaces et a la casse donc pas ouf
 #sleep 1
 delbook "bible" 
 print_books 
@@ -405,7 +440,8 @@ number_books_by_gender #Marche maintenant
 top_5_authors #Marche maintenant 
 books_by_decades #Marche maintenant 
 
-emprunter_livre 
-retourner_livre
+#emprunter_livre 
+#retourner_livre
 Livres_Empruntes 
 Livres_en_retard
+Historique_emprunts
