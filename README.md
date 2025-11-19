@@ -8,7 +8,7 @@
  Créer un système complet de gestion de livres avec fichiers plats (CSV/texte).
 
 ### Membres du groupe (Groupe TP C) : 
- * Vincent Duriez  
+ * Vincent Duriez (22300445)
  * Camille Kasteleyn  
  * Theo Hecquet  
  * Fabien Lembre (22303886)
