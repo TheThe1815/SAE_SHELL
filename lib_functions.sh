@@ -245,14 +245,17 @@ searchYears(){
 }
 
 searchAll(){
-    read -p "Entrez des mots clé pour la recherche : " motscle
+    # Recherche de livre par mots clé dans toutes les colonnes
+    read -p "Entrez des mots clé pour la recherche (laisser vide pour tout afficher) : " motscle
     lignes=`tail -n +2 books.csv`
+    # on enleve les livres qui ne contiennent pas tous les mots clés 
     for mot in $motscle; do
         lignes=`echo "$lignes" | grep -i "$mot"`
     done
 
     [ -z "$lignes" ] && echo "Aucun livre correspondant" && return
 
+    #affichage des lignes qui contiennent les mots clés
     echo "$lignes" | while IFS=',' read -r id _; do
         afficheLivre "$id"
     done
@@ -371,7 +374,7 @@ retourner_livre() {
     fi
     # Remplace "emprunté" par "disponible" pour ce livre dans books.csv et par "rendu" dans emprunts.csv
     sed -i "/^$id_livre,/s/emprunté/disponible/" books.csv
-    sed -i "/^$id_livre,/s/emprunté/rendu/" books.csv 
+    sed -i "/^$id_livre,/s/emprunté/rendu/" emprunts.csv 
     echo "Livre avec ID $id_livre retourné avec succès."
 }
 
@@ -437,11 +440,42 @@ Historique_emprunts(){
     fi
 
     echo "---------------- Historique des emprunts : ----------------"
+    # Demande et vérifie l'ID (vide = tout afficher)
+    while true; do
+        read -p "ID du livre pour afficher l'historique (laisser vide pour tout afficher) : " id_recherche
+        id_recherche=$(echo "$id_recherche" | tr -d '\r' | tr -s ' ')
+        # on accepte champ vide
+        [ -z "$id_recherche" ] && break
+        # doit être numérique
+        if ! [[ "$id_recherche" =~ ^[0-9]+$ ]]; then
+            echo "ID invalide : doit être un nombre."
+            continue
+        fi
+        # doit exister dans books.csv
+        if ! grep -q "^${id_recherche}," books.csv; then
+            echo "Aucun livre avec l'ID $id_recherche."
+            continue
+        fi
+        # tout est OK
+        break
+    done
+
     tail -n +2 emprunts.csv | while IFS=',' read -r id_livre nom_emprunteur date_emprunt date_retour statut ; do
-        if [ "$statut" = "emprunté" ]; then
-            echo "- Emprunt du livre "$id_livre" par "$nom_emprunteur" le "$date_emprunt" à rendre avant le "$date_retour" inclus."
-        else
-            echo "- Emprunt du livre "$id_livre" par "$nom_emprunteur" le "$date_emprunt" rendu avant le "$date_retour" inclus."
+        # Affiche toutes les lignes si id_recherche vide, sinon seulement celles correspondant à l'ID demandé
+        if [ -z "$id_recherche" ] || [ "$id_recherche" = "$id_livre" ]; then
+            if [ "$statut" = "emprunté" ]; then
+                if [ -z "$id_recherche" ]; then
+                    echo "- Emprunt du livre "$id_livre" par "$nom_emprunteur" le "$date_emprunt" à rendre avant le "$date_retour" inclus."
+                else
+                    echo "- Emprunt par "$nom_emprunteur" le "$date_emprunt" à rendre avant le "$date_retour" inclus."
+                fi
+            else
+                if [ -z "$id_recherche" ]; then
+                    echo "- Emprunt du livre "$id_livre" par "$nom_emprunteur" le "$date_emprunt" rendu avant le "$date_retour" inclus."
+                else
+                    echo "- Emprunt par "$nom_emprunteur" le "$date_emprunt" rendu avant le "$date_retour" inclus."
+                fi
+            fi
         fi
     done
 }
