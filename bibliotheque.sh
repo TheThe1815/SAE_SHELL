@@ -1,5 +1,5 @@
 #!/bin/bash
-source lib_functions.sh
+source ./lib_functions.sh
 
 menu_gestion_livres(){
     rep=0
@@ -14,8 +14,7 @@ menu_gestion_livres(){
         echo "--- Lister des livres ?           taper 4 ---"
         echo "--- Return au menu principal ?    taper 5 ---"
         echo ""
-        read -p "============= Votre choix ? ============
-        " choix
+        read -p "Votre choix ? : " choix
 
         case $choix in
             1) 
@@ -109,10 +108,9 @@ menu_recherches_filtre(){
         echo "--- Recherche par genre ?       taper 3 ---"
         echo "--- Recherche par année ?       taper 4 ---"
         echo "--- Recherche avancée ?         taper 5 ---"
-        echo "--- Return au menu principal ?  taper 6 ---"
+        echo "--- Retour au menu principal ?  taper 6 ---"
         echo ""
-        read -p "============= Votre choix ? ============
-        " choix
+        read -p "Votre choix ? : " choix
 
         case $choix in
             1)
@@ -205,35 +203,31 @@ menu_stats(){
     rep=0
     while [ "$rep" != 5 ]; do
         clear
-        echo "========== Satistiques =========="
+        echo "========== Statistiques =========="
         echo ""
         echo "-- Que voulez-vous afficher ? --"
         echo "--- Nombre total de livre ?                     taper 1 ---"
         echo "--- Repartition par genre ?                     taper 2 ---"
-        echo "--- Le Top 5 des auteurs  les plus presents ?   taper 3 ---"
+        echo "--- Le Top 5 des auteurs les plus présents ?   taper 3 ---"
         echo "--- Livres par décennie ?                       taper 4 ---"
-        echo "--- Return au menu principal ?                  taper 5 ---"
+        echo "--- Retour au menu principal ?                  taper 5 ---"
         echo ""
-        read -p "============= Votre choix ? ============" choix
-
+        read -p "Votre choix ? : " choix
+        clear
 
         case "$choix" in
             1)
                 total_books
-                sleep 1;;
-                #read -p "Voulez-vous enregistrer ces statistiques ? (oui/non) : " enregister
-                #[ "$enregister" = 'oui' ] && enregister ;;
-
+                read -p "Appuyez sur une touche pour continuer..." -n1 -s ;;
             2)
                 number_books_by_gender
-                sleep 1;;
-
+                read -p "Appuyez sur une touche pour continuer..." -n1 -s ;;
             3)
                 top_5_authors
-                sleep 1;;
+                read -p "Appuyez sur une touche pour continuer..." -n1 -s ;;
             4)
                 books_by_decades
-                sleep 1;;
+                read -p "Appuyez sur une touche pour continuer..." -n1 -s ;;
             5)
                 rep=5;;
             *)
@@ -244,41 +238,39 @@ menu_stats(){
     done
 }
 
-menu_empunts(){
+menu_emprunts(){
     rep=0
     while [ "$rep" != 6 ]; do
         clear
-        echo "========== Empunts =========="
+        echo "========== Emprunts =========="
         echo ""
         echo "-- Que voulez-vous faire ? --"
-        echo "--- Empunter un livre ?               taper 1 ---"
-        echo "--- Return un livre ?                 taper 2 ---"
+        echo "--- Emprunter un livre ?               taper 1 ---"
+        echo "--- Retourner un livre ?               taper 2 ---"
         echo "--- Lister les livres empruntés ?     taper 3 ---"
         echo "--- Lister les livres en retard ?     taper 4 ---"
         echo "--- Historique des emprunts ?         taper 5 ---"
-        echo "--- Return au menu principal ?        taper 6 ---"
+        echo "--- Retour au menu principal ?        taper 6 ---"
         echo ""
-        read -p "============= Votre choix ? ============" choix
-
+        read -p "Votre choix ? : " choix
+        clear
 
         case "$choix" in
             1)
                 emprunter_livre
-                sleep 1;;
-
+                read -p "Appuyez sur une touche pour continuer..." -n1 -s ;;
             2)
                 retourner_livre
-                sleep 1;;
-
+                read -p "Appuyez sur une touche pour continuer..." -n1 -s ;;
             3)
                 Livres_Empruntes
-                sleep 1;;
+                read -p "Appuyez sur une touche pour continuer..." -n1 -s ;;
             4)
                 Livres_en_retard
-                sleep 1;;
+                read -p "Appuyez sur une touche pour continuer..." -n1 -s ;;
             5)
                 Historique_emprunts
-                sleep 1;;
+                read -p "Appuyez sur une touche pour continuer..." -n1 -s ;;
             6)
                 rep=6;;
             *)
@@ -290,27 +282,19 @@ menu_empunts(){
 }
 
 
-
-
-
 # -------------- MENU PRINCIPAL ------------
 
 quitter=1
 while [ "$quitter" != 0 ]; do
     clear
-    echo "---- Bienvenu dans notre Biblioteque interactif ----"
+    echo "---- Bienvenue dans notre Bibliothèque interactive ----"
     echo "============= Que souhaitez vous faire ? ============= "
     echo " Gestion des livres :     tapez 1"
-    echo " Recherche et filtre :    tapez 2"
+    echo " Recherche et filtres :    tapez 2"
     echo " Statistiques :           tapez 3"
     echo " Emprunts :               tapez 4"
     echo " Quittez :                tapez 5"
-    if alerteLivreRetard; then #Si la condition est une fonction pas de []
-        echo "==================================================="
-        echo "Attention il y a du retard dans les emprunts"
-    fi
-    read -p "==================== Votre choix ? ==================
-    " principalChoix
+    read -p "Votre choix ? : " principalChoix
 
     case "$principalChoix" in
         1) 
@@ -320,7 +304,7 @@ while [ "$quitter" != 0 ]; do
         3)
             menu_stats ;;
         4)
-            menu_empunts ;;
+            menu_emprunts ;;
         5)
             quitter=0 ;;    
         *)

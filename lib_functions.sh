@@ -89,7 +89,7 @@ print_books() {
         echo "--------------------------------------------------------------------------------"
 
         # Calcule les lignes à afficher
-        local start_line=$(( (page - 1) * per_page + 2 ))  # +2 pour sauter l'en-tête
+        local start_line=$(( (page - 1) * per_page + 1 ))  # +2 pour sauter l'en-tête
         local end_line=$(( start_line + per_page - 1 ))
 
         # Affiche les lignes de la page courante
@@ -235,7 +235,7 @@ searchYears(){
     #affichage des lignes ou l'année est compris entre les dates
     trouver=0
     while IFS=',' read -r id titre auteur annee genre statue; do
-        if [[ "$annee" -ge "$a1" && "$annee" -le "$a2"]]; then
+        if [ "$annee" -ge "$a1"] && ["$annee" -le "$a2"]; then
             afficheLivre "$id"
             trouver=1
         fi
@@ -265,11 +265,10 @@ searchAll(){
 
 # Affiche le nombre total de livres et ceux empruntés
 total_books() {
-    local cpt_emprunts=$(wc -l < "emprunts.csv")
+    local cpt_emprunts=$(grep -c ",emprunté" books.csv)
     local cpt_livres=$(wc -l < "books.csv")
 
     ((cpt_livres--))
-    ((cpt_emprunts--))
     echo "Nombre total de livres dans la bibliothèque : $cpt_livres dont $cpt_emprunts empruntés."
 }
 
@@ -414,23 +413,6 @@ Livres_en_retard() {
         echo "Aucun livre en retard."
     fi
     rm -f .livres_retard.tmp
-}
-
-alerteLivreRetard() {
-    today=$(date +%Y-%m-%d)
-    if [ ! -f "emprunts.csv" ]; then
-        echo "Aucun emprunt enregistré."
-        return
-    fi
-
-    retard=0
-    while IFS=',' read -r id_livre nom_emprunteur date_emprunt date_retour statut; do
-        if [[ "$statut" = "emprunté" ]] && [[ "$date_retour" < "$today" ]]; then
-            return 0 #0-> vrai en bash 
-        fi
-    done < <(tail -n +2 emprunts.csv) #Pas possible de mettre un pipe si return
-
-    return 1
 }
 
 Historique_emprunts(){
