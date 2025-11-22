@@ -2,7 +2,7 @@ ID,Titre,Auteur,Année,Genre,Statut
 1,Le Petit Prince,Antoine de Saint-Exupéry,1943,Conte,disponible
 2,Les Misérables,Victor Hugo,1862,Roman,disponible
 3,1984,George Orwell,1949,Dystopie,emprunté
-4,La Peste,Albert Camus,1947,Roman,disponible
+4,La Peste,Albert Camus,1947,Roman,emprunté
 5,Hamlet,William Shakespeare,1603,Théâtre,emprunté
 6,Le Rouge et le Noir,Stendhal,1830,Roman,disponible
 7,L'Étranger,Albert Camus,1942,Roman,disponible
@@ -12,7 +12,5 @@ ID,Titre,Auteur,Année,Genre,Statut
 11,Le Meilleur des mondes,Aldous Huxley,1932,Dystopie,disponible
 12,La Promesse de l'aube,Romain Gary,1960,Autobiographie,disponible
 14,Mon Livre,Moi,2020,SF,disponible
-14,Truc,Bertrand M,2024,Comique,disponible
-15,Sitch,BM,2024,Fantasy,disponible
-16,Je sais pas,BM,2021,Comique,disponible
-17,1816,JJK,1620,js,disponible
+14,Ta,Jakubiak,2004,Fantasy,disponible
+15,Stitch,BM,2024,Fantasy,disponible

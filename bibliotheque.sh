@@ -3,7 +3,7 @@ source lib_functions.sh
 
 menu_gestion_livres(){
     rep=0
-    while [ "$rep" != 5 ]; do
+    while [ "$rep" != 1 ]; do
         clear
         echo "========== Gestion des Livres =========="
         echo ""
@@ -12,10 +12,11 @@ menu_gestion_livres(){
         echo "--- Modifier un livre ?           taper 2 ---"
         echo "--- Supprimer un livre ?          taper 3 ---"
         echo "--- Lister des livres ?           taper 4 ---"
-        echo "--- Return au menu principal ?    taper 5 ---"
+        echo "--- Return au menu principal (q)? taper 5 ---"
         echo ""
-        read -p "============= Votre choix ? ============
-        " choix
+        echo "============= Votre choix ? ============"
+        echo ""
+        read -n 1 -s choix
 
         case $choix in
             1) 
@@ -29,15 +30,12 @@ menu_gestion_livres(){
                     read -p "Genre du livre ?  : " genre
                     add_book "$titre" "$auteur" "$annee" "$genre" 
                     sleep 1
-                    read -p "Voulez-vous ajouter un nouveau livre ? : (oui/non) 
-" reponse
-                    if [[ "$reponse" != 'oui' && "$reponse" != 'non' ]]; then
-                        echo "Reponse invalide, retour au menu"
-                        continu=1
-                    fi
-                    if [[ "$reponse" == 'non' ]]; then
-                        continu=1
-                    fi
+                    echo "Voulez-vous ajouter un autre livre ? : (y/n) "
+                    while true; do
+                        read -n 1 -s -r reponse
+                        [ "$reponse" == 'n' ] && continu=1 && break
+                        [ "$reponse" == 'y' ] && break
+                    done
                 done;;
 
             2) 
@@ -53,15 +51,12 @@ menu_gestion_livres(){
                     newStatue="disponible"
                     modify_book "$titre" "$newTitre" "$newAuteur" "$newAnnee" "$newGenre" "$newStatue"
                     sleep 1
-                    read -p "Voulez-vous modifier un autre livre ? : (oui/non) 
-" reponse
-                    if [[ "$reponse" != 'oui' && "$reponse" != 'non' ]]; then
-                        echo "Reponse invalide, retour au menu"
-                        continu=1
-                    fi
-                    if [[ "$reponse" == 'non' ]]; then
-                        continu=1
-                    fi
+                    echo "Voulez-vous modifier un autre livre ? : (y/n) "
+                    while true; do
+                        read -n 1 -s -r reponse
+                        [ "$reponse" == 'n' ] && continu=1 && break
+                        [ "$reponse" == 'y' ] && break
+                    done
                 done;;
             3)
                 clear
@@ -72,130 +67,107 @@ menu_gestion_livres(){
                     read -p "Titre du livre à supprimer ? : " titre
                     delbook "$titre" 
                     sleep 1
-                    read -p "Voulez-vous supprimer un autre livre ? : (oui/non) 
-" reponse
-                    if [[ "$reponse" != 'oui' && "$reponse" != 'non' ]]; then
-                        echo "Reponse invalide, retour au menu"
-                        continu=1
-                    fi
-                    if [[ "$reponse" == 'non' ]]; then
-                        continu=1
-                    fi
+                    echo "Voulez-vous supprimer un autre livre ? : (y/n) "
+                    while true; do
+                        read -n 1 -s -r reponse
+                        [ "$reponse" == 'n' ] && continu=1 && break
+                        [ "$reponse" == 'y' ] && break
+                    done
                 done;;
 
             4)
                 print_books ;;
-
             5)
-                rep=5 ;;
+                rep=1;;
+            q)
+                rep=1 ;;
 
             *)
-                echo "!!! Erreur de saisi !!!"
-                echo "Veuillez entrez un nombre correct "
-                sleep 1;;
+                ;;
         esac 
     done
 }
 
 menu_recherches_filtre(){
     rep=0 
-    while [ "$rep" != 6 ]; do
+    while [ "$rep" != 1 ]; do
         clear
         echo "========== Recherche et Filtres =========="
         echo ""
         echo "-- Que voulez-vous faire ? --"
-        echo "--- Recherche par titre ?       taper 1 ---"
-        echo "--- Recherche par auteur ?      taper 2 ---"
-        echo "--- Recherche par genre ?       taper 3 ---"
-        echo "--- Recherche par année ?       taper 4 ---"
-        echo "--- Recherche avancée ?         taper 5 ---"
-        echo "--- Return au menu principal ?  taper 6 ---"
+        echo "--- Recherche par titre ?           taper 1 ---"
+        echo "--- Recherche par auteur ?          taper 2 ---"
+        echo "--- Recherche par genre ?           taper 3 ---"
+        echo "--- Recherche par année ?           taper 4 ---"
+        echo "--- Recherche avancée ?             taper 5 ---"
+        echo "--- Return au menu principal (q) ?  taper 6 ---"
         echo ""
-        read -p "============= Votre choix ? ============
-        " choix
+        echo "============= Votre choix ? ============"
+        echo ""
+        read -n 1 -s choix
 
         case $choix in
             1)
                 continu=0
                 while [ "$continu" != 1 ]; do
                     searchTitle
-                    read -p "Voulez-vous rechercher un autre livre avec un titre ? : (oui/non) 
-" reponse
-                    if [[ "$reponse" != 'oui' && "$reponse" != 'non' ]]; then
-                        echo "Reponse invalide, retour au menu"
-                        continu=1
-                        sleep 1
-                    fi
-                    if [[ "$reponse" == 'non' ]]; then
-                        continu=1
-                    fi
+                    echo "Voulez-vous rechercher un autre livre avec le titre ? : (y/n) "
+                    while true; do
+                        read -n 1 -s -r reponse
+                        [ "$reponse" == 'n' ] && continu=1 && break
+                        [ "$reponse" == 'y' ] && break
+                    done
                 done;;
             2)
                 continu=0
                 while [ "$continu" != 1 ]; do
                     searchAutor
-                    read -p "Voulez-vous rechercher un autre livre avec un auteur ? : (oui/non) 
-" reponse
-                    if [[ "$reponse" != 'oui' && "$reponse" != 'non' ]]; then
-                        echo "Reponse invalide, retour au menu"
-                        sleep 1
-                        continu=1
-                    fi
-                    if [[ "$reponse" == 'non' ]]; then
-                        continu=1
-                    fi
+                    echo "Voulez-vous rechercher un autre livre avec son auteur ? : (y/n) "
+                    while true; do
+                        read -n 1 -s -r reponse
+                        [ "$reponse" == 'n' ] && continu=1 && break
+                        [ "$reponse" == 'y' ] && break
+                    done
                 done;;
             3) 
                 continu=0
                 while [ "$continu" != 1 ]; do
                     searchGender
-                    read -p "Voulez-vous rechercher un autre livre avec le genre ? : (oui/non) 
-" reponse
-                    if [[ "$reponse" != 'oui' && "$reponse" != 'non' ]]; then
-                        echo "Reponse invalide, retour au menu"
-                        sleep 1
-                        continu=1
-                    fi
-                    if [[ "$reponse" == 'non' ]]; then
-                        continu=1
-                    fi
+                    echo "Voulez-vous rechercher un autre livre avec son genre ? : (y/n) "
+                    while true; do
+                        read -n 1 -s -r reponse
+                        [ "$reponse" == 'n' ] && continu=1 && break
+                        [ "$reponse" == 'y' ] && break
+                    done
                 done;;
             4) 
                 continu=0
                 while [ "$continu" != 1 ]; do
                     searchYears
-                    read -p "Voulez-vous rechercher un autre livre avec l'année ? : (oui/non) 
-" reponse
-                    if [[ "$reponse" != 'oui' && "$reponse" != 'non' ]]; then
-                        echo "Reponse invalide, retour au menu"
-                        sleep 1
-                        continu=1
-                    fi
-                    if [[ "$reponse" == 'non' ]]; then
-                        continu=1
-                    fi
+                    echo "Voulez-vous rechercher un autre livre avec les années ? : (y/n) "
+                    while true; do
+                        read -n 1 -s -r reponse
+                        [ "$reponse" == 'n' ] && continu=1 && break
+                        [ "$reponse" == 'y' ] && break
+                    done
                 done;;
             5) 
                 continu=0
                 while [ "$continu" != 1 ]; do
                     searchAll
-                    read -p "Voulez-vous faire une rechercher avancee avec d'autre livre ? : (oui/non) 
-" reponse
-                    if [[ "$reponse" != 'oui' && "$reponse" != 'non' ]]; then
-                        echo "Reponse invalide, retour au menu"
-                        sleep 1
-                        continu=1
-                    fi
-                    if [[ "$reponse" == 'non' ]]; then
-                        continu=1
-                    fi
+                    echo "Voulez-vous rechercher un autre livre avec plusieurs criteres ? : (y/n) "
+                    while true; do
+                        read -n 1 -s -r reponse
+                        [ "$reponse" == 'n' ] && continu=1 && break
+                        [ "$reponse" == 'y' ] && break
+                    done
                 done;;
-            6) 
-                rep=6 ;;
+            q) 
+                rep=1 ;;
+            6)
+                rep=1 ;;
             *) 
-                echo "!!! Erreur de saisi !!!"
-                echo "Veuillez entrez un nombre correct "
-                sleep 1;;
+                ;;
         esac
 
     done
@@ -203,7 +175,7 @@ menu_recherches_filtre(){
 
 menu_stats(){
     rep=0
-    while [ "$rep" != 5 ]; do
+    while [ "$rep" != 1 ]; do
         clear
         echo "========== Satistiques =========="
         echo ""
@@ -212,41 +184,68 @@ menu_stats(){
         echo "--- Repartition par genre ?                     taper 2 ---"
         echo "--- Le Top 5 des auteurs  les plus presents ?   taper 3 ---"
         echo "--- Livres par décennie ?                       taper 4 ---"
-        echo "--- Return au menu principal ?                  taper 5 ---"
+        echo "--- Return au menu principal (q) ?              taper 5 ---"
         echo ""
-        read -p "============= Votre choix ? ============" choix
+        echo "============= Votre choix ? ============"
+        echo ""
+        read -n 1 -s choix
 
 
         case "$choix" in
             1)
+                continu=0
                 total_books
-                sleep 1;;
-                #read -p "Voulez-vous enregistrer ces statistiques ? (oui/non) : " enregister
-                #[ "$enregister" = 'oui' ] && enregister ;;
+                echo "(q) pour quitter "
+                while [ "$continu" != 1 ]; do
+                    read -n 1 -s -r reponse
+                    if [ "$reponse" == 'q' ]; then
+                        continu=1
+                    fi
+                done;;
 
             2)
+                continu=0
                 number_books_by_gender
-                sleep 1;;
-
+                echo "(q) pour quitter "
+                while [ "$continu" != 1 ]; do
+                    read -n 1 -s -r reponse
+                    if [ "$reponse" == 'q' ]; then
+                        continu=1
+                    fi
+                done;;
             3)
+                continu=0
                 top_5_authors
-                sleep 1;;
+                echo "(q) pour quitter "
+                while [ "$continu" != 1 ]; do
+                    read -n 1 -s -r reponse
+                    if [ "$reponse" == 'q' ]; then
+                        continu=1
+                    fi
+                done;;
             4)
+                continu=0
                 books_by_decades
-                sleep 1;;
+                echo "(q) pour quitter "
+                while [ "$continu" != 1 ]; do
+                    read -n 1 -s -r reponse
+                    if [ "$reponse" == 'q' ]; then
+                        continu=1
+                    fi
+                done;;
             5)
-                rep=5;;
+                rep=1 ;;
+            q)
+                rep=1;;
             *)
-                echo "!!! Erreur de saisi !!!"
-                echo "Veuillez entrez un nombre correct "
-                sleep 1;;
+                ;;
         esac
     done
 }
 
 menu_empunts(){
     rep=0
-    while [ "$rep" != 6 ]; do
+    while [ "$rep" != 1 ]; do
         clear
         echo "========== Empunts =========="
         echo ""
@@ -256,35 +255,58 @@ menu_empunts(){
         echo "--- Lister les livres empruntés ?     taper 3 ---"
         echo "--- Lister les livres en retard ?     taper 4 ---"
         echo "--- Historique des emprunts ?         taper 5 ---"
-        echo "--- Return au menu principal ?        taper 6 ---"
+        echo "--- Return au menu principal (q) ?    taper 6 ---"
         echo ""
-        read -p "============= Votre choix ? ============" choix
+        echo "============= Votre choix ? ============"
+        echo ""
+        read -n 1 -s choix
 
 
         case "$choix" in
             1)
                 emprunter_livre
-                sleep 1;;
+                sleep 2;;
 
             2)
                 retourner_livre
-                sleep 1;;
+                sleep 2;;
 
             3)
+                continu=0
                 Livres_Empruntes
-                sleep 1;;
+                echo "(q) pour quitter "
+                while [ "$continu" != 1 ]; do
+                    read -n 1 -s -r reponse
+                    if [ "$reponse" == 'q' ]; then
+                        continu=1
+                    fi
+                done;;
             4)
+                continu=0
                 Livres_en_retard
-                sleep 1;;
+                echo "(q) pour quitter "
+                while [ "$continu" != 1 ]; do
+                    read -n 1 -s -r reponse
+                    if [ "$reponse" == 'q' ]; then
+                        continu=1
+                    fi
+                done;;
             5)
+                continu=0
                 Historique_emprunts
-                sleep 1;;
+                echo "(q) pour quitter "
+                while [ "$continu" != 1 ]; do
+                    read -n 1 -s -r reponse
+                    if [ "$reponse" == 'q' ]; then
+                        continu=1
+                    fi
+                done;;
             6)
-                rep=6;;
+                rep=1 ;;
+            q)
+                rep=1 ;;
             *)
-                echo "!!! Erreur de saisi !!!"
-                echo "Veuillez entrez un nombre correct "
-                sleep 1;;
+                ;;
         esac
     done
 }
@@ -295,8 +317,8 @@ menu_empunts(){
 
 # -------------- MENU PRINCIPAL ------------
 
-quitter=1
-while [ "$quitter" != 0 ]; do
+quitter=0
+while [ "$quitter" != 1 ]; do
     clear
     echo "---- Bienvenu dans notre Biblioteque interactif ----"
     echo "============= Que souhaitez vous faire ? ============= "
@@ -304,13 +326,14 @@ while [ "$quitter" != 0 ]; do
     echo " Recherche et filtre :    tapez 2"
     echo " Statistiques :           tapez 3"
     echo " Emprunts :               tapez 4"
-    echo " Quittez :                tapez 5"
+    echo " Quittez (q) :            tapez 5"
     if alerteLivreRetard; then #Si la condition est une fonction pas de []
         echo "==================================================="
         echo "Attention il y a du retard dans les emprunts"
     fi
-    read -p "==================== Votre choix ? ==================
-    " principalChoix
+    echo "============= Votre choix ? ============"
+    echo ""
+    read -n 1 -s principalChoix
 
     case "$principalChoix" in
         1) 
@@ -322,10 +345,10 @@ while [ "$quitter" != 0 ]; do
         4)
             menu_empunts ;;
         5)
-            quitter=0 ;;    
+            quitter=1 ;;
+        q)
+            quitter=1 ;;    
         *)
-            echo "!!! Erreur de saisi !!!"
-            echo "Veuillez entrez un nombre correct " 
-            sleep 1;;
+            ;;
     esac
 done

@@ -4,6 +4,7 @@ Id_Livre,Nom_Emprunteur,Date_Emprunt,Date_Retour_Prévue,Statut
 1,Jean Dupont,2025-10-15,2025-11-01,rendu
 5,Claire Petit,2025-10-20,2025-11-03,rendu
 3,Paul Durand,2025-10-25,2025-11-08,rendu
+4,Paul Durand,2025-04-12,2025-06-16,emprunté
 8,Julie Moreau,2025-10-26,2025-11-03,emprunté
 10,Emma Dubois,2025-11-05,2025-11-11,emprunté
 1,Marie Martin,2025-11-10,2025-11-19,emprunté
@@ -11,3 +12,5 @@ Id_Livre,Nom_Emprunteur,Date_Emprunt,Date_Retour_Prévue,Statut
 3,Lucie Bernard,2025-11-15,2025-11-29,emprunté
 2,Victor Petit,2025-11-16,2025-11-30,emprunté
 7,Anna Rousseau,2025-11-17,2025-12-01,emprunté
+1,Camille,2025-11-22,2025-12-12,emprunté
+12,Cam,2025-11-22,2026-01-05,emprunté

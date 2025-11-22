@@ -7,8 +7,17 @@ Membres du groupe : Camille Kasteleyn, Theo Hecquet, Fabien Lembre
     !! Regler l'alerte des emprunts !! 
     afficher les genre qui existe ?
 
-    incomprehension : dans recherche les read sont dans les fonctions mais dans gestion non  
+    incomprehension : dans recherche les read -p sont dans les fonctions mais dans gestion non  
 
+    fonctions searchAll peut-etre a refaire
+
+    dans l'affiche par pagination, si on supprime un livre il peut y avoir une page sans aucun livre (a la fin)
+
+    les csv ne sont pas modifier a l'ajout d'un livre mais a l'emprunt oui, parcontre le rendu d'un livre ne se modifie pas dans le csv
+
+    fonction des emprunts en retard qui ne marche pas
+
+    
 
 
 

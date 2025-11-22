@@ -223,7 +223,7 @@ searchYears(){
     a2=$(echo "$a2" | tr -s ' ')
 
     #si l'année est vide
-    [ -z "$a" || -z "$a2" ] && echo "Un annee peut pas etre vide" && return
+    [[ -z "$a" && -z "$a2" ]] && echo "Un annee peut pas etre vide" && return
 
     #si a1 est plus grand que a2, on les inverse
     if [ "$a1" -gt "$a2" ]; then
@@ -235,7 +235,7 @@ searchYears(){
     #affichage des lignes ou l'année est compris entre les dates
     trouver=0
     while IFS=',' read -r id titre auteur annee genre statue; do
-        if [[ "$annee" -ge "$a1" && "$annee" -le "$a2"]]; then
+        if [[ "$annee" -ge "$a1" && "$annee" -le "$a2" ]]; then
             afficheLivre "$id"
             trouver=1
         fi
@@ -245,14 +245,17 @@ searchYears(){
 }
 
 searchAll(){
-    read -p "Entrez des mots clé pour la recherche : " motscle
-    lignes=`tail -n +2 books.csv`
+    # Recherche de livre par mots clé dans toutes les colonnes
+    read -p "Entrez des mots clé pour la recherche (laisser vide pour tout afficher) : " motscle
+    lignes=$(tail -n +2 books.csv)
+    # on enleve les livres qui ne contiennent pas tous les mots clés 
     for mot in $motscle; do
-        lignes=`echo "$lignes" | grep -i "$mot"`
+        lignes=$(echo "$lignes" | grep -i "$mot")
     done
 
     [ -z "$lignes" ] && echo "Aucun livre correspondant" && return
 
+    #affichage des lignes qui contiennent les mots clés
     echo "$lignes" | while IFS=',' read -r id _; do
         afficheLivre "$id"
     done
@@ -416,7 +419,6 @@ Livres_en_retard() {
 alerteLivreRetard() {
     today=$(date +%Y-%m-%d)
     if [ ! -f "emprunts.csv" ]; then
-        echo "Aucun emprunt enregistré."
         return
     fi
 
@@ -446,6 +448,4 @@ Historique_emprunts(){
     done
 }
 
-
-# ----------------------- Tests des fonctions -----------------------
 
