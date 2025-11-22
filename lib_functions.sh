@@ -155,18 +155,18 @@ searchTitle() {
     motcle=$(echo "$motcle" | tr -s ' ')
 
     #si le titre est vide
-    [ -z "$motcle" ] && echo "Un titre ne peut pas etre vide nonuche" && return
-    
-
-    lignes=$(grep -i "$motcle" books.csv | tr -s ' ' | cut -d',' -f1,2)
-
-    #si il n'y a aucun titre
-    [ -z "$lignes" ] && echo "Aucun titre correspondant" && return
+    [ -z "$motcle" ] && echo "Un titre ne peut pas etre vide" && return
 
     #affichage des lignes qui contiennent le titre
-    echo "$lignes" | while IFS=',' read -r id; do
-        afficheLivre "$id"
-    done
+    trouver=0
+    while IFS=',' read -r id titre auteur annee genre statue; do
+        if echo "$titre" | grep -iq "$motcle"; then
+            afficheLivre "$id"
+            trouver=1
+        fi
+    done < <(tail -n +2 books.csv)
+
+    [ "$trouver" -eq 0 ] && echo "Aucun titre correspondant"
 }
 
 # Recherche de livre par auteur
@@ -177,17 +177,18 @@ searchAuthor(){
     motcle=$(echo "$motcle" | tr -s ' ')
 
     #si l'auteur est vide
-    [ -z "$motcle" ] && echo "Un auteur ne peut pas etre vide nonuche" && return
-    
-    lignes=$(grep -i "$motcle" books.csv | tr -s ' ' | cut -d',' -f1,3)
-
-    #si il n'y a aucun auteur
-    [ -z "$lignes" ] && echo "Aucun auteur correspondant" && return
+    [ -z "$motcle" ] && echo "Un auteur ne peut pas etre vide" && return
 
     #affichage des lignes qui contiennent l'auteur
-    echo "$lignes" | while IFS=',' read -r id auteur; do
-        afficheLivre "$id"
-    done
+    trouver=0
+    while IFS=',' read -r id titre auteur annee genre statue; do
+        if echo "$auteur" | grep -iq "$motcle"; then
+            afficheLivre "$id"
+            trouver=1
+        fi
+    done < <(tail -n +2 books.csv)
+
+    [ "$trouver" -eq 0 ] && echo "Aucun auteur correspondant"
 }
 
 # Recherche de livre par genre
@@ -198,38 +199,49 @@ searchGender(){
     motcle=$(echo "$motcle" | tr -s ' ')
 
     #si le genre est vide
-    [ -z "$motcle" ] && echo "Un genre peut pas etre vide nonuche" && return
-
-    lignes=$(grep -i "$motcle" books.csv | tr -s ' ' | cut -d',' -f1,5)
-
-    #si il n'y a aucun 
-    [ -z "$lignes" ] && echo "Aucun genre correspondant" && return
+    [ -z "$motcle" ] && echo "Un genre peut pas etre vide" && return
 
     #affichage des lignes qui contiennent le genre
-    echo "$lignes" | while IFS=',' read -r id genre; do
-        afficheLivre "$id"
-    done
+    trouver=0
+    while IFS=',' read -r id titre auteur annee genre statue; do
+        if echo "$genre" | grep -iq "$motcle"; then
+            afficheLivre "$id"
+            trouver=1
+        fi
+    done < <(tail -n +2 books.csv) #Option pour garder les modif dans un while
+
+    [ "$trouver" -eq 0 ] && echo "Aucun genre correspondant"
 }
 
 # Recherche de livre par année
 searchYears(){
-    read -p "Entrez une année pour la recherche : " motcle
+    read -p "Entrez l'année de debut pour la recherche : " a1
+    read -p "Entrez l'année de fin pour la recherche : " a2
 
     #on enleve tous les espaces inutiles
-    motcle=$(echo "$motcle" | tr -s ' ')
+    a1=$(echo "$a1" | tr -s ' ')
+    a2=$(echo "$a2" | tr -s ' ')
 
     #si l'année est vide
-    [ -z "$motcle" ] && echo "Un annee peut pas etre vide nonuche" && return
+    [ -z "$a" || -z "$a2" ] && echo "Un annee peut pas etre vide" && return
 
-    lignes=$(grep -i "$motcle" books.csv | tr -s ' ' | cut -d',' -f1,4)
+    #si a1 est plus grand que a2, on les inverse
+    if [ "$a1" -gt "$a2" ]; then
+        tmp=$a1
+        a1=$a2
+        a2=$tmp
+    fi
 
-    #si il n'y a aucun livre pour l'annee demander
-    [ -z "$lignes" ] && echo "Aucune année correspondante" && return
+    #affichage des lignes ou l'année est compris entre les dates
+    trouver=0
+    while IFS=',' read -r id titre auteur annee genre statue; do
+        if [[ "$annee" -ge "$a1" && "$annee" -le "$a2"]]; then
+            afficheLivre "$id"
+            trouver=1
+        fi
+    done < <(tail -n +2 books.csv) #Option pour garder les modif dans un while
 
-    #affichage des lignes qui contiennent le genre
-    echo "$lignes" | while IFS=',' read -r id annee; do
-        afficheLivre "$id"
-    done
+    [ "$trouver" -eq 0 ] && echo "Aucune annee correspondante"
 }
 
 searchAll(){
@@ -401,6 +413,23 @@ Livres_en_retard() {
     rm -f .livres_retard.tmp
 }
 
+alerteLivreRetard() {
+    today=$(date +%Y-%m-%d)
+    if [ ! -f "emprunts.csv" ]; then
+        echo "Aucun emprunt enregistré."
+        return
+    fi
+
+    retard=0
+    while IFS=',' read -r id_livre nom_emprunteur date_emprunt date_retour statut; do
+        if [[ "$statut" = "emprunté" ]] && [[ "$date_retour" < "$today" ]]; then
+            return 0 #0-> vrai en bash 
+        fi
+    done < <(tail -n +2 emprunts.csv) #Pas possible de mettre un pipe si return
+
+    return 1
+}
+
 Historique_emprunts(){
     if [ ! -f "emprunts.csv" ]; then
         echo "Aucun emprunt enregistré."
@@ -420,28 +449,3 @@ Historique_emprunts(){
 
 # ----------------------- Tests des fonctions -----------------------
 
-delbook "mon livre"
-add_book "bible" "appotre" "50" "SF" 
-add_book "bible" "appotre" "50" "SF" 
-add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
-modify_book "mon Livre" "Mon livre" "Toi" "2025" "Roman" #marche mais sensible aux espaces et a la casse donc pas ouf
-#sleep 1
-delbook "bible" 
-print_books 
-
-#searchTitle #marche mais recherche pas uniquement dans le titre (ex : pour 1984, le livre ayant le titre 1984 et le livre datant de 1984 seront affichés)
-#searchAuthor #pareil
-#searchGender #pareil
-#searchYears #pareil et ça doit rechercher les livres entre 2 années
-searchAll
-
-total_books #Marche maintenant 
-number_books_by_gender #Marche maintenant 
-top_5_authors #Marche maintenant 
-books_by_decades #Marche maintenant 
-
-#emprunter_livre 
-#retourner_livre
-Livres_Empruntes 
-Livres_en_retard
-Historique_emprunts

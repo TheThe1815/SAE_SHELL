@@ -1,51 +1,50 @@
-# SAE_SHELL : Système de Gestion de Bibliothèque Personnelle
-### Objectifs :
- * Manipulation de fichiers texte  
- * Gestion de données structurées sans base de données  
- * Menu interactif et interface utilisateur  
- * Fonctions de recherche et filtrage  
-### Description :
- Créer un système complet de gestion de livres avec fichiers plats (CSV/texte).
+# SAE_SHELL
+Membres du groupe : Camille Kasteleyn, Theo Hecquet, Fabien Lembre
 
-### Membres du groupe (Groupe TP C) : 
- * Vincent Duriez (22300445)
- * Camille Kasteleyn 
- * Theo Hecquet (22204967)
- * Fabien Lembre (22303886)
+# LISTE DES PROBLEMES ENREGISTRER : 
+    lister les livres : commence a la ligne 3 (n'affiche pas le petit prince)
+    modif des livres : devrons-nous pas ignorer les cases? 
+    !! Regler l'alerte des emprunts !! 
+    afficher les genre qui existe ?
 
-## Répartition des tâches :
+    incomprehension : dans recherche les read sont dans les fonctions mais dans gestion non  
 
-### Partie de Vincent :
-**Partie gestion des livres :**  
-- *add_book()* : ajouter un livre avec génération automatique d'ID
-- *modify_book()* : modifier un livre existant
-- *delbook()* : supprimer un livre 
-- *print_books()* : lister tous les livres avec pagination
+
+
 
 ### Partie de Camille :
-**Partie recherche et filtres :**  
-- *searchTitle()* : rechercher par titre (recherche partielle)
-- *searchAuthor()* : rechercher par auteur
-- *searchGender()* : filtrer par genre
-- *searchYears()* : filtrer par année (plage de dates)
-- **PAS ENCORE FAIT** Recherche avancée (plusieurs critères combinés)
+
+delbook "mon livre"
+add_book "bible" "appotre" "50" "SF" 
+add_book "bible" "appotre" "50" "SF" 
+add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
+modify_book "mon Livre" "Mon livre" "Toi" "2025" "Roman" #marche mais sensible aux espaces et a la casse donc pas ouf
+#sleep 1
+delbook "bible" 
+print_books 
+
+#searchTitle #marche mais recherche pas uniquement dans le titre (ex : pour 1984, le livre ayant le titre 1984 et le livre datant de 1984 seront affichés)
+#searchAuthor #pareil
+#searchGender #pareil
+#searchYears #pareil et ça doit rechercher les livres entre 2 années
+searchAll
+
+total_books #Marche maintenant 
+number_books_by_gender #Marche maintenant 
+top_5_authors #Marche maintenant 
+books_by_decades #Marche maintenant 
+
+#emprunter_livre 
+#retourner_livre
+Livres_Empruntes 
+Livres_en_retard
+Historique_emprunts
 
 ### Partie de Théo :
-**Partie statistiques et rapports :**  
-- *total_books()* : Nombre total de livres
-- *number_books_by_gender()* : Répartition par genre (graphique ASCII)
-- *top_5_authors()* : Top 5 auteurs les plus présents
-- *books_by_decades()* : Livres par décennie
-- **PAS ENCORE FAIT** Export des résultats en HTML ou PDF
+
 
 ### Partie de Fabien :
-**Partie Documentation, Livrables et Tests**
-**Partie gestion des emprunts :**  
-- *emprunter_livre()* : Ajoute un emprunt dans emprunts.csv et met le statut du livre à *emprunté*
-- *retourner_livre()* : met le statut du livre à *rendu*
-- *Livres_Empruntes()* : 
-- *Livres_en_retard()* :
-- *Historique_emprunts()* :
+
 
 
 ### Partie GPTo
@@ -328,3 +327,5 @@ Interface web minimale (si autorisé).
 Ne pas verrouiller → perte de données si plusieurs accès.
 
 Ne pas gérer les accents/encoding → mauvaises recherches.
+
+Supposer que tous les utilisateurs utilisent la même locale.
