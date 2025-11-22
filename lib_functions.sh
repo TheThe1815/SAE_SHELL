@@ -235,11 +235,7 @@ searchYears(){
     #affichage des lignes ou l'année est compris entre les dates
     trouver=0
     while IFS=',' read -r id titre auteur annee genre statue; do
-<<<<<<< HEAD
         if [[ "$annee" -ge "$a1" && "$annee" -le "$a2" ]]; then
-=======
-        if [ "$annee" -ge "$a1"] && ["$annee" -le "$a2"]; then
->>>>>>> 4dce532ab48e8a8435fc12b2f5212c7fce569074
             afficheLivre "$id"
             trouver=1
         fi
@@ -251,11 +247,7 @@ searchYears(){
 searchAll(){
     # Recherche de livre par mots clé dans toutes les colonnes
     read -p "Entrez des mots clé pour la recherche (laisser vide pour tout afficher) : " motscle
-<<<<<<< HEAD
     lignes=$(tail -n +2 books.csv)
-=======
-    lignes=`tail -n +2 books.csv`
->>>>>>> 4dce532ab48e8a8435fc12b2f5212c7fce569074
     # on enleve les livres qui ne contiennent pas tous les mots clés 
     for mot in $motscle; do
         lignes=$(echo "$lignes" | grep -i "$mot")
@@ -423,7 +415,6 @@ Livres_en_retard() {
     rm -f .livres_retard.tmp
 }
 
-<<<<<<< HEAD
 alerteLivreRetard() {
     today=$(date +%Y-%m-%d)
     if [ ! -f "emprunts.csv" ]; then
@@ -440,8 +431,6 @@ alerteLivreRetard() {
     return 1
 }
 
-=======
->>>>>>> 4dce532ab48e8a8435fc12b2f5212c7fce569074
 Historique_emprunts(){
     if [ ! -f "emprunts.csv" ]; then
         echo "Aucun emprunt enregistré."
