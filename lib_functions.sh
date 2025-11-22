@@ -290,23 +290,29 @@ searchAll(){
 
 # ----------------------- Statistiques et Rapports -----------------------
 
-# Affiche le nombre total de livres et ceux empruntés
+# Affiche le nombre total de livres disponible dans la bibliotheque
 total_books() {
-    local cpt_emprunts=$(grep -c ",emprunté" books.csv)
-    local cpt_livres=$(wc -l < "books.csv")
+    local cpt_livres=$(grep -c "dispo" books.csv)
 
-    ((cpt_livres--))
-    echo "Nombre total de livres dans la bibliothèque : $cpt_livres dont $cpt_emprunts empruntés."
+    # rm total.txt 
+
+    > total.txt
+
+    echo "Nombre total de livres disponible dans la bibliothèque : $cpt_livres." >> total.txt
 }
 
 number_books_by_gender() {
     echo "--- Par Genre ---"
-    # On utilise "books.csv" directement pour éviter l'erreur de variable vide
+    
     if [ ! -f "books.csv" ]; then echo "Fichier introuvable"; return; fi
+
+    # rm books_by_gender.txt
+
+    > books_by_gender.txt
 
     tail -n +2 "books.csv" | cut -d',' -f5 | sort | uniq -c | while read count genre; do
         printf "%-15s [%s] : " "$genre" "$count"
-        # Histogramme
+        echo "$genre : $count" >> books_by_gender.txt
         for ((i=0; i<count; i++)); do printf "#"; done
         echo ""
     done
@@ -316,25 +322,80 @@ top_5_authors() {
     echo "--- Top 5 Auteurs ---"
     if [ ! -f "books.csv" ]; then echo "Fichier introuvable"; return; fi
 
-    tail -n +2 "books.csv" | cut -d',' -f3 | sort | uniq -c | sort -nr | head -n 5
+    # rm authors.txt
+
+    > authors.txt
+
+    tail -n +2 "books.csv" | cut -d',' -f3 | sort | uniq -c | sort -nr | head -n 5 | while read count auteur; do
+        echo "$auteur : $count" >> authors.txt
+    done
 }
 
 books_by_decades() {
     echo "--- Par Décennies ---"
     if [ ! -f "books.csv" ]; then echo "Fichier introuvable"; return; fi
-
-    # Fichier temporaire pour le calcul
-    > decades.tmp
+    
     tail -n +2 "books.csv" | cut -d',' -f4 | while read annee; do
         # Vérifie que l'année est bien un nombre avant de calculer
         if [[ "$annee" =~ ^[0-9]+$ ]]; then
             dec=$(( (annee / 10) * 10 ))
-            echo "$dec" >> decades.tmp
+            echo "$dec" >> decadesTmp.txt
         fi
     done
     
-    sort decades.tmp | uniq -c
-    rm decades.tmp
+    sort decadesTmp.txt | uniq -c > vFinalDecades.txt
+
+    rm decadesTmp.txt
+}
+
+# enscript_format() {
+#     # cp total.txt "totalcp.txt"
+#     # cp authors.txt "Les_5_auteurs_les_plus_présents.txt"
+#     # cp vFinalDecades.txt "Nombre de livre par décennie.txt"
+#     # cp books_by_gender.txt "Nombre de livre(s) par genre.txt"
+#     # les cp servaietn pour sauvegarder les .txt d'origine mais en fait ca sert a rien 
+
+#     iconv -f UTF-8 -t ISO-8859-1//TRANSLIT total.txt > "total.txt"
+#     iconv -f UTF-8 -t ISO-8859-1//TRANSLIT authors.txt > "authors.txt"
+#     iconv -f UTF-8 -t ISO-8859-1//TRANSLIT vFinalDecades.txt > "vFinalDecades.txt"
+#     iconv -f UTF-8 -t ISO-8859-1//TRANSLIT books_by_gender.txt > "books_by_gender.txt"
+
+#     enscript -2rG --file-align=1 \
+#              -b "Rapport Complet Bibliothèque" \
+#              -p - \
+#              "total.txt" \
+#              "authors.txt" \
+#              "vFinalDecades.txt" \
+#              "books_by_gender.txt" \
+#              | ps2pdf - rapport_complet.pdf
+
+#     rm "total.txt" "authors.txt" "vFinalDecades.txt" "books_by_gender.txt"   
+# }
+
+enscript_format() {
+    echo "Génération du PDF..."
+
+    local TITRE=$(echo "Rapport Complet Bibliothèque" | iconv -f UTF-8 -t ISO-8859-1//TRANSLIT)
+    
+    iconv -f UTF-8 -t ISO-8859-1//TRANSLIT "total.txt" > "Inventaire"
+    iconv -f UTF-8 -t ISO-8859-1//TRANSLIT "authors.txt" > "Top_5_auteurs"
+    iconv -f UTF-8 -t ISO-8859-1//TRANSLIT "vFinalDecades.txt" > "Livres_par_decennie"
+    iconv -f UTF-8 -t ISO-8859-1//TRANSLIT "books_by_gender.txt" > "Livres_par_genre"
+
+    enscript -2rG --file-align=1 \
+             -X 88591 \
+             -b "$TITRE" \
+             -p - \
+             "Inventaire" \
+             "Top_5_auteurs" \
+             "Livres_par_decennie" \
+             "Livres_par_genre" \
+             | ps2pdf - rapport_complet.pdf
+
+    # 4. Nettoyage : On supprime UNIQUEMENT les fichiers temporaires
+    rm "Inventaire" "Top_5_auteurs" "Livres_par_decennie" "Livres_par_genre"
+    
+    echo "PDF généré, vous pouvez l'utiliser à votre guise !"
 }
 
 # ----------------------- Emprunts -----------------------
@@ -505,4 +566,32 @@ Historique_emprunts(){
     done
 }
 
+# je l'ai remis c'etait pour mes tests, faut juste le supp apres
 
+delbook "mon livre"
+add_book "bible" "appotre" "50" "SF" 
+add_book "bible" "appotre" "50" "SF" 
+add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
+add_book "Le dispo" "Moi" "2020" "SF"
+modify_book "mon Livre" "Mon livre" "Toi" "2025" "Roman" #marche mais sensible aux espaces et a la casse donc pas ouf
+#sleep 1
+delbook "bible" 
+print_books 
+
+#searchTitle #marche mais recherche pas uniquement dans le titre (ex : pour 1984, le livre ayant le titre 1984 et le livre datant de 1984 seront affichés)
+#searchAuthor #pareil
+#searchGender #pareil
+#searchYears #pareil et ça doit rechercher les livres entre 2 années
+searchAll
+
+total_books #Marche maintenant 
+number_books_by_gender #Marche maintenant 
+top_5_authors #Marche maintenant 
+books_by_decades #Marche maintenant 
+enscript_format
+
+#emprunter_livre 
+#retourner_livre
+# Livres_Empruntes 
+# Livres_en_retard
+# Historique_emprunts
