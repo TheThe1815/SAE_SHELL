@@ -1,8 +1,6 @@
 # SAE_SHELL : Système de Gestion de Bibliothèque Personnelle
 
-<<<<<<< HEAD
 # LISTE DES PROBLEMES ENREGISTRER : 
-    lister les livres : commence a la ligne 3 (n'affiche pas le petit prince)
     modif des livres : devrons-nous pas ignorer les cases? 
     !! Regler l'alerte des emprunts !! 
     afficher les genre qui existe ?
@@ -18,7 +16,6 @@
     fonction des emprunts en retard qui ne marche pas
 
     
-=======
 ### Objectifs :
  * Manipulation de fichiers texte  
  * Gestion de données structurées sans base de données  
@@ -32,7 +29,6 @@
  * Camille Kasteleyn  
  * Theo Hecquet (22204967)
  * Fabien Lembre (22303886)
->>>>>>> 4dce532ab48e8a8435fc12b2f5212c7fce569074
 
 ## Répartition des tâches :
 
@@ -49,6 +45,9 @@
 - *searchAuthor()* : rechercher par auteur
 - *searchGender()* : filtrer par genre
 - *searchYears()* : filtrer par année (plage de dates)
+
+**Partie menu interactif**
+
 
 ### Partie de Théo :
 **Partie statistiques et rapports :**  

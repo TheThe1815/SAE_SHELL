@@ -12,7 +12,7 @@ menu_gestion_livres(){
         echo "--- Modifier un livre ?           taper 2 ---"
         echo "--- Supprimer un livre ?          taper 3 ---"
         echo "--- Lister des livres ?           taper 4 ---"
-        echo "--- Return au menu principal (q)? taper 5 ---"
+        echo "--- Retour au menu principal (q)? taper 5 ---"
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
@@ -43,14 +43,13 @@ menu_gestion_livres(){
                 clear
                 continu=0
                 while [ "$continu" != 1 ]; do
-                    echo "_________ Modif d'un livre _________"
+                    echo "_________ Modification d'un livre _________"
                     read -p "Titre du livre a modifier ?  : " titre
                     read -p "Nouveau titre ?   : " newTitre
                     read -p "Nouveau auteur ?  : " newAuteur
                     read -p "Nouvelle annee ?  : " newAnnee
                     read -p "Nouveau genre ?   : " newGenre
-                    newStatue="disponible"
-                    modify_book "$titre" "$newTitre" "$newAuteur" "$newAnnee" "$newGenre" "$newStatue"
+                    modify_book "$titre" "$newTitre" "$newAuteur" "$newAnnee" "$newGenre"
                     sleep 1
                     echo "Voulez-vous modifier un autre livre ? : (y/n) "
                     while true; do
@@ -107,12 +106,12 @@ menu_recherches_filtre(){
         echo "--- Recherche par genre ?           taper 3 ---"
         echo "--- Recherche par année ?           taper 4 ---"
         echo "--- Recherche avancée ?             taper 5 ---"
-        echo "--- Return au menu principal (q) ?  taper 6 ---"
+        echo "--- Retour au menu principal (q) ?  taper 6 ---"
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
         read -n 1 -s choix
-
+        clear
         case $choix in
             1)
                 continu=0
@@ -129,7 +128,7 @@ menu_recherches_filtre(){
             2)
                 continu=0
                 while [ "$continu" != 1 ]; do
-                    searchAutor
+                    searchAuthor
                     echo "Voulez-vous rechercher un autre livre avec son auteur ? : (y/n) "
                     while true; do
                         read -n 1 -s -r reponse
@@ -199,7 +198,7 @@ menu_stats(){
         echo "--- Repartition par genre ?                     taper 2 ---"
         echo "--- Le Top 5 des auteurs les plus présents ?    taper 3 ---"
         echo "--- Livres par décennie ?                       taper 4 ---"
-        echo "--- Return au menu principal (q) ?              taper 5 ---"
+        echo "--- Retour au menu principal (q) ?              taper 5 ---"
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
@@ -277,7 +276,7 @@ menu_emprunts(){
         echo "--- Lister les livres empruntés ?     taper 3 ---"
         echo "--- Lister les livres en retard ?     taper 4 ---"
         echo "--- Historique des emprunts ?         taper 5 ---"
-        echo "--- Return au menu principal (q) ?    taper 6 ---"
+        echo "--- Retour au menu principal (q) ?    taper 6 ---"
         echo ""
         echo "============= Votre choix ? ============"
         echo ""

@@ -19,8 +19,11 @@ add_book() {
     local annee="$3"
     local genre="$4"
     csv_existe
-   
-    local id=$(wc -l books.csv | cut -d' ' -f1 | tr -s " " )
+
+    # Récupère l'ID de la dernière ligne et incrémente de 1
+    local id=$(tail -n 1 books.csv | cut -d',' -f1)
+    id=$((id + 1))
+
     if ! [[ "$annee" =~ ^[0-9]{1,4}$ ]] || [ "$annee" -gt "$(date +%Y)" ]; then
         echo "Erreur : L'année n'est pas valide."
         return  1
@@ -50,8 +53,32 @@ modify_book() {
         return  1
     fi
 
+    # Récupère les informations actuelles du livre
+    local ligne_actuelle
+    ligne_actuelle=$(grep -i ",$titre," books.csv)
+    local id=$(echo "$ligne_actuelle" | cut -d, -f1)
+    local ctitre=$(echo "$ligne_actuelle" | cut -d, -f2)
+    local cauteur=$(echo "$ligne_actuelle" | cut -d, -f3)
+    local cannee=$(echo "$ligne_actuelle" | cut -d, -f4)
+    local cgenre=$(echo "$ligne_actuelle" | cut -d, -f5)
+    local cstatut=$(echo "$ligne_actuelle" | cut -d, -f6)
+
+    # Parcourt chaque champ et met à jour uniquement si une nouvelle valeur est fournie
+    if [ -z "$ntitre" ]; then
+        ntitre="$ctitre"
+    fi
+    if [ -z "$nauteur" ]; then
+        nauteur="$cauteur"
+    fi
+    if [ -z "$nannee" ]; then
+        nannee="$cannee"
+    fi
+    if [ -z "$ngenre" ]; then
+        ngenre="$cgenre"
+    fi
+
     # Construit la nouvelle ligne
-    local nouvelle_ligne="$(grep -i ",$titre," books.csv | cut -d, -f1),$ntitre,$nauteur,$nannee,$ngenre,$nstatut"
+    local nouvelle_ligne="$id,$ntitre,$nauteur,$nannee,$ngenre,$cstatut"
 
     # Remplace la ligne
     sed -i "/,$titre,/c\\$nouvelle_ligne" books.csv
