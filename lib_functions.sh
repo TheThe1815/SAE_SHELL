@@ -193,7 +193,7 @@ searchAuthor(){
 
 # Recherche de livre par genre
 searchGender(){
-    read -p "Entrez un genre pour la recherche (...): " motcle
+    read -p "Entrez un genre pour la recherche : " motcle
 
     #on enleve tous les espaces inutiles
     motcle=$(echo "$motcle" | tr -s ' ')
