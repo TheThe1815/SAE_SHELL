@@ -292,51 +292,55 @@ searchAll(){
 
 # Affiche le nombre total de livres disponible dans la bibliotheque
 total_books() {
+    echo "--- Bilan ---"
     local cpt_livres=$(grep -c "dispo" books.csv)
 
-    # rm total.txt 
+    local message="Nombre total de livres disponibles : $cpt_livres"
 
-    > total.txt
-
-    echo "Nombre total de livres disponible dans la bibliothèque : $cpt_livres." >> total.txt
+    echo "$message" | tee total.txt
+    echo "" 
 }
 
+# 2. Par Genre (Avec ton super graphique en barres #)
 number_books_by_gender() {
     echo "--- Par Genre ---"
-    
     if [ ! -f "books.csv" ]; then echo "Fichier introuvable"; return; fi
-
-    # rm books_by_gender.txt
 
     > books_by_gender.txt
 
     tail -n +2 "books.csv" | cut -d',' -f5 | sort | uniq -c | while read count genre; do
-        printf "%-15s [%s] : " "$genre" "$count"
+
         echo "$genre : $count" >> books_by_gender.txt
+
+        printf "%-15s [%2d] : " "$genre" "$count"
         for ((i=0; i<count; i++)); do printf "#"; done
-        echo ""
+        echo "" # Retour à la ligne pour l'écran
     done
 }
 
+# 3. Top 5 Auteurs
 top_5_authors() {
     echo "--- Top 5 Auteurs ---"
     if [ ! -f "books.csv" ]; then echo "Fichier introuvable"; return; fi
 
-    # rm authors.txt
-
     > authors.txt
 
     tail -n +2 "books.csv" | cut -d',' -f3 | sort | uniq -c | sort -nr | head -n 5 | while read count auteur; do
-        echo "$auteur : $count" >> authors.txt
+        # On formate la ligne une seule fois
+        local ligne="$auteur : $count livre(s)"
+        
+        # On l'affiche ET on la sauvegarde
+        echo "$ligne" | tee -a authors.txt
     done
 }
 
+# 4. Par Décennies
 books_by_decades() {
     echo "--- Par Décennies ---"
     if [ ! -f "books.csv" ]; then echo "Fichier introuvable"; return; fi
     
+    > decadesTmp.txt
     tail -n +2 "books.csv" | cut -d',' -f4 | while read annee; do
-        # Vérifie que l'année est bien un nombre avant de calculer
         if [[ "$annee" =~ ^[0-9]+$ ]]; then
             dec=$(( (annee / 10) * 10 ))
             echo "$dec" >> decadesTmp.txt
@@ -344,33 +348,13 @@ books_by_decades() {
     done
     
     sort decadesTmp.txt | uniq -c > vFinalDecades.txt
+    
+    cat vFinalDecades.txt | while read count decennie; do
+        echo "Années $decennie : $count livres"
+    done
 
     rm decadesTmp.txt
 }
-
-# enscript_format() {
-#     # cp total.txt "totalcp.txt"
-#     # cp authors.txt "Les_5_auteurs_les_plus_présents.txt"
-#     # cp vFinalDecades.txt "Nombre de livre par décennie.txt"
-#     # cp books_by_gender.txt "Nombre de livre(s) par genre.txt"
-#     # les cp servaietn pour sauvegarder les .txt d'origine mais en fait ca sert a rien 
-
-#     iconv -f UTF-8 -t ISO-8859-1//TRANSLIT total.txt > "total.txt"
-#     iconv -f UTF-8 -t ISO-8859-1//TRANSLIT authors.txt > "authors.txt"
-#     iconv -f UTF-8 -t ISO-8859-1//TRANSLIT vFinalDecades.txt > "vFinalDecades.txt"
-#     iconv -f UTF-8 -t ISO-8859-1//TRANSLIT books_by_gender.txt > "books_by_gender.txt"
-
-#     enscript -2rG --file-align=1 \
-#              -b "Rapport Complet Bibliothèque" \
-#              -p - \
-#              "total.txt" \
-#              "authors.txt" \
-#              "vFinalDecades.txt" \
-#              "books_by_gender.txt" \
-#              | ps2pdf - rapport_complet.pdf
-
-#     rm "total.txt" "authors.txt" "vFinalDecades.txt" "books_by_gender.txt"   
-# }
 
 enscript_format() {
     echo "Génération du PDF..."
