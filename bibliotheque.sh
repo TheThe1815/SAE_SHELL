@@ -12,7 +12,7 @@ menu_gestion_livres(){
         echo "--- Modifier un livre ?           taper 2 ---"
         echo "--- Supprimer un livre ?          taper 3 ---"
         echo "--- Lister des livres ?           taper 4 ---"
-        echo "--- Retour au menu principal (q)? taper 5 ---"
+        echo "--- Retour au menu principal (q)? "
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
@@ -78,10 +78,7 @@ menu_gestion_livres(){
             4)
                 print_books 
                 ;;
-            5)
-                rep=1
-                ;;
-            q)
+            q | Q)
                 rep=1 
                 ;;
 
@@ -104,7 +101,7 @@ menu_recherches_filtre(){
         echo "--- Recherche par genre ?           taper 3 ---"
         echo "--- Recherche par année ?           taper 4 ---"
         echo "--- Recherche avancée ?             taper 5 ---"
-        echo "--- Retour au menu principal (q) ?  taper 6 ---"
+        echo "--- Retour au menu principal (q) ?  "
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
@@ -171,10 +168,7 @@ menu_recherches_filtre(){
                     done
                 done
                 ;;
-            q) 
-                rep=1 
-                ;;
-            6)
+            q | Q) 
                 rep=1 
                 ;;
             *) 
@@ -197,7 +191,7 @@ menu_stats(){
         echo "--- Le Top 5 des auteurs les plus présents ?    taper 3 ---"
         echo "--- Livres par décennie ?                       taper 4 ---"
         echo "--- Enregistrer les resultats dans un PDF ?     taper 5 ---"
-        echo "--- Retour au menu principal (q) ?              taper 6 ---"
+        echo "--- Retour au menu principal (q) ?              "
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
@@ -254,11 +248,8 @@ menu_stats(){
                 enscript_format
                 sleep 10
                 ;;
-            6)
+            q | Q)
                 rep=1 
-                ;;
-            q)
-                rep=1
                 ;;
             *)
                 :
@@ -279,7 +270,7 @@ menu_emprunts(){
         echo "--- Lister les livres empruntés ?     taper 3 ---"
         echo "--- Lister les livres en retard ?     taper 4 ---"
         echo "--- Historique des emprunts ?         taper 5 ---"
-        echo "--- Retour au menu principal (q) ?    taper 6 ---"
+        echo "--- Retour au menu principal (q) ?    "
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
@@ -331,10 +322,7 @@ menu_emprunts(){
                     done
                 done
                 ;;
-            6)
-                rep=1 
-                ;;
-            q)
+            q | Q)
                 rep=1 
                 ;;
             *)
@@ -356,7 +344,7 @@ while [ "$quitter" != 1 ]; do
     echo " Recherche et filtres :   tapez 2"
     echo " Statistiques :           tapez 3"
     echo " Emprunts :               tapez 4"
-    echo " Quittez (q) :            tapez 5"
+    echo " Quittez (q) :            "
     if alerteLivreRetard; then #Si la condition est une fonction pas de []
         echo "==================================================="
         echo "Attention il y a du retard dans les emprunts"
@@ -378,10 +366,7 @@ while [ "$quitter" != 1 ]; do
         4)
             menu_emprunts 
             ;;
-        5)
-            quitter=1 
-            ;;
-        q)
+        q | Q)
             quitter=1 
             ;;    
         *)

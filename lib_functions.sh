@@ -128,17 +128,17 @@ print_books() {
         echo -e "n: page suivante | p: page précédente | q: quitter\n"
         read -n 1 -s -r key
         case $key in
-            n)
+            n | N)
                 if [ $page -lt $total_pages ]; then
                     ((page++))
                 fi
                 ;;
-            p)
+            p | P)
                 if [ $page -gt 1 ]; then
                     ((page--))
                 fi
                 ;;
-            q)
+            q | Q)
                 break
                 ;;
         esac

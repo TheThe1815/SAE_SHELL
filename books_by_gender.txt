@@ -6,8 +6,5 @@ Fantasy : 2
 Roman : 4
 Romance : 1
 SF : 2
-Théâtre : 1
-<<<<<<< HEAD
+Théâtre : 2
 covid : 1
-=======
->>>>>>> 688770d9be4d5517fb662878423c578bb315dc0e

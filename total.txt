@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-Nombre total de livres disponibles : 11
-=======
-Nombre total de livres disponibles : 10
->>>>>>> 688770d9be4d5517fb662878423c578bb315dc0e
+Nombre total de livres disponibles : 12
