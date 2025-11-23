@@ -1,20 +1,4 @@
 # SAE_SHELL : Système de Gestion de Bibliothèque Personnelle
-
-# LISTE DES PROBLEMES ENREGISTRER : 
-    modif des livres : devrons-nous pas ignorer les cases? 
-    !! Regler l'alerte des emprunts !! 
-    afficher les genre qui existe ?
-
-    incomprehension : dans recherche les read -p sont dans les fonctions mais dans gestion non  
-
-    fonctions searchAll peut-etre a refaire
-
-    dans l'affiche par pagination, si on supprime un livre il peut y avoir une page sans aucun livre (a la fin)
-
-    les csv ne sont pas modifier a l'ajout d'un livre mais a l'emprunt oui, parcontre le rendu d'un livre ne se modifie pas dans le csv
-
-    fonction des emprunts en retard qui ne marche pas
-
     
 ### Objectifs :
  * Manipulation de fichiers texte  
@@ -22,7 +6,7 @@
  * Menu interactif et interface utilisateur  
  * Fonctions de recherche et filtrage  
 ### Description :
- Créer un système complet de gestion de livres avec fichiers plats (CSV/texte).
+ Créer un système complet de gestion de livres avec fichiers CSV.
 
 ### Membres du groupe (Groupe TP C) : 
  * Vincent Duriez (22300445)
@@ -47,7 +31,11 @@
 - *searchYears()* : filtrer par année (plage de dates)
 
 **Partie menu interactif**
-
+- *menu_gestion_livres()* : gère le menu de gestion de livres
+- *menu_recherches_filtre()* : gère le menu de recherches et filtres
+- *menu_stats()* : gère le menu des statistiques
+- *menu_emprunts()* : gère le menu des emprunts
+- *menu_principal()* : gère le menu principal en appelant les autres menus selon le choix de l'utilisateur
 
 ### Partie de Théo :
 **Partie statistiques et rapports :**  
@@ -59,7 +47,7 @@
 - *enscript_format()* : Export des resultats sous format PDF
 
 ### Partie de Fabien :
-**Partie Documentation, Livrables et Tests**
+**Partie Documentation, Améliorations et Tests**
 
 **Partie recherche et filtres :**
 - *SearchAll()* Recherche avancée (un ou plusieurs critères combinés)
