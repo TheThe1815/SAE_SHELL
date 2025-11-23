@@ -55,7 +55,8 @@
 - *number_books_by_gender()* : Répartition par genre (graphique ASCII)
 - *top_5_authors()* : Top 5 auteurs les plus présents
 - *books_by_decades()* : Livres par décennie
-- **PAS ENCORE FAIT** Export des résultats en HTML ou PDF
+- *installer_enscript()* : Installer enscript s'il n'est pas sur le pc
+- *enscript_format()* : Export des resultats sous format PDF
 
 ### Partie de Fabien :
 **Partie Documentation, Livrables et Tests**
