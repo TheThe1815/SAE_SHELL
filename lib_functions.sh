@@ -22,7 +22,7 @@ add_book() {
 
     # Récupère l'ID de la dernière ligne et incrémente de 1
     local id=$(tail -n 1 books.csv | cut -d',' -f1)
-    id=$((id + 1))
+    id=$[id + 1]
 
     if ! [[ "$annee" =~ ^[0-9]{1,4}$ ]] || [ "$annee" -gt "$(date +%Y)" ]; then
         echo "Erreur : L'année n'est pas valide."
@@ -105,7 +105,7 @@ print_books() {
     local page=1
     local per_page=5
     local total_lines=$(wc -l < "books.csv")
-    local total_pages=$(( (total_lines - 1 + per_page - 1) / per_page ))  # -1 pour ignorer l'en-tête
+    local total_pages=$[ (total_lines - 1 + per_page - 1) / per_page ]  # -1 pour ignorer l'en-tête
 
     while true; do
         clear
@@ -116,8 +116,8 @@ print_books() {
         echo "--------------------------------------------------------------------------------"
 
         # Calcule les lignes à afficher
-        local start_line=$(( (page - 1) * per_page + 1 ))  # +2 pour sauter l'en-tête
-        local end_line=$(( start_line + per_page - 1 ))
+        local start_line=$[ (page - 1) * per_page + 1 ]  # +2 pour sauter l'en-tête
+        local end_line=$[ start_line + per_page - 1 ]
 
         # Affiche les lignes de la page courante
         tail -n +2 "books.csv" | sed -n "${start_line},${end_line}p" | while IFS=, read -r id titre auteur annee genre statut; do
@@ -130,12 +130,12 @@ print_books() {
         case $key in
             n)
                 if [ $page -lt $total_pages ]; then
-                    ((page++))
+                    page=$[page+1]
                 fi
                 ;;
             p)
                 if [ $page -gt 1 ]; then
-                    ((page--))
+                    page=$[page-1]
                 fi
                 ;;
             q)
@@ -292,12 +292,15 @@ searchAll(){
 
 # Affiche le nombre total de livres disponible dans la bibliotheque
 total_books() {
-    echo "--- Bilan ---"
-    local cpt_livres=$(grep -c "dispo" books.csv)
+    echo "--- Total ---"
+    local cpt_dispos=$(grep -c ",disponible" books.csv)
+    local cpt_livres=$(wc -l < "books.csv")
+    cpt_livres=$[cpt_livres - 1] # On retire l'en-tête
 
-    local message="Nombre total de livres disponibles : $cpt_livres"
+    local message="Nombre total de livres dans la bibliothèque : $cpt_livres dont $cpt_dispos livres disponibles."
 
-    echo "$message" | tee total.txt
+    echo "$message" 
+    echo "$message" > total.txt
     echo "" 
 }
 
@@ -309,7 +312,6 @@ number_books_by_gender() {
     > books_by_gender.txt
 
     tail -n +2 "books.csv" | cut -d',' -f5 | sort | uniq -c | while read count genre; do
-
         echo "$genre : $count" >> books_by_gender.txt
 
         printf "%-15s [%2d] : " "$genre" "$count"
@@ -330,7 +332,8 @@ top_5_authors() {
         local ligne="$auteur : $count livre(s)"
         
         # On l'affiche ET on la sauvegarde
-        echo "$ligne" | tee -a authors.txt
+        echo "$ligne"
+        echo "$ligne" >> authors.txt
     done
 }
 
@@ -342,14 +345,14 @@ books_by_decades() {
     > decadesTmp.txt
     tail -n +2 "books.csv" | cut -d',' -f4 | while read annee; do
         if [[ "$annee" =~ ^[0-9]+$ ]]; then
-            dec=$(( (annee / 10) * 10 ))
+            dec=$[ (annee / 10) * 10 ]
             echo "$dec" >> decadesTmp.txt
         fi
     done
     
-    sort decadesTmp.txt | uniq -c > vFinalDecades.txt
+    sort decadesTmp.txt | uniq -c > books_by_decades.txt
     
-    cat vFinalDecades.txt | while read count decennie; do
+    cat books_by_decades.txt | while read count decennie; do
         echo "Années $decennie : $count livres"
     done
 
@@ -358,36 +361,38 @@ books_by_decades() {
 
 # Installer enscript et ghostscript sur votre pc
 installer_enscript() {
-    echo "🔍 Vérification des dépendances..."
-
     if ! command -v enscript &> /dev/null; then
-        echo "⚠️  'enscript' est manquant. Installation..."
+        echo "Installation de enscript..."
         sudo apt-get update && sudo apt-get install -y enscript
-    else
-        echo "✅  'enscript' est déjà installé."
     fi
 
     if ! command -v ps2pdf &> /dev/null; then
-        echo "⚠️  'ps2pdf' (ghostscript) est manquant. Installation..."
+        echo "Installation de ghostscript..."
         sudo apt-get install -y ghostscript
-    else
-        echo "✅  'ps2pdf' est déjà installé."
     fi
-    
-    echo "--- Prêt à travailler ---"
     echo ""
 }
 
 # Prend les informations et les transforme en un rapport sous format pdf
 enscript_format() {
+    # 1. Génération des fichiers texte
+    total_books
+    number_books_by_gender
+    top_5_authors
+    books_by_decades
+    clear 
+    
+    # 2. Installation des outils nécessaires
     installer_enscript
     echo "Génération du PDF..."
+
+    # 3. Conversion des fichiers texte en PDF avec enscript et ps2pdf
 
     local TITRE=$(echo "Rapport Complet Bibliothèque" | iconv -f UTF-8 -t ISO-8859-1//TRANSLIT)
     
     iconv -f UTF-8 -t ISO-8859-1//TRANSLIT "total.txt" > "Inventaire"
     iconv -f UTF-8 -t ISO-8859-1//TRANSLIT "authors.txt" > "Top_5_auteurs"
-    iconv -f UTF-8 -t ISO-8859-1//TRANSLIT "vFinalDecades.txt" > "Livres_par_decennie"
+    iconv -f UTF-8 -t ISO-8859-1//TRANSLIT "books_by_decades.txt" > "Livres_par_decennie"
     iconv -f UTF-8 -t ISO-8859-1//TRANSLIT "books_by_gender.txt" > "Livres_par_genre"
 
     enscript -2rG --file-align=1 \
@@ -419,7 +424,6 @@ emprunter_livre() {
     fi
     # Vérifie si le livre est déjà emprunté
     statut=`grep "^$id_livre," books.csv | cut -d',' -f6 | tr -d '\r'`
-    echo "Statut du livre : $statut"
     if [ "$statut" = "emprunté" ]; then
         echo "Le livre avec ID $id_livre est déjà emprunté."
         return 1
@@ -488,7 +492,7 @@ Livres_Empruntes() {
 }
 
 Livres_en_retard() {
-    today=$(date +%Y-%m-%d)
+    today=`date +%Y-%m-%d`
     if [ ! -f "emprunts.csv" ]; then
         echo "Aucun emprunt enregistré."
         return
@@ -561,45 +565,15 @@ Historique_emprunts(){
                 if [ -z "$id_recherche" ]; then
                     echo "- Emprunt du livre "$id_livre" par "$nom_emprunteur" le "$date_emprunt" à rendre avant le "$date_retour" inclus."
                 else
-                    echo "- Emprunt par "$nom_emprunteur" le "$date_emprunt" à rendre avant le "$date_retour" inclus."
+                    echo "- Emprunt par "$nom_emprunteur" le "$date_emprunteur" à rendre avant le "$date_retour" inclus."
                 fi
             else
                 if [ -z "$id_recherche" ]; then
-                    echo "- Emprunt du livre "$id_livre" par "$nom_emprunteur" le "$date_emprunt" rendu avant le "$date_retour" inclus."
+                    echo "- Emprunt du livre "$id_livre" par "$nom_emprunteur" le "$date_emprunte" rendu avant le "$date_retour" inclus."
                 else
-                    echo "- Emprunt par "$nom_emprunteur" le "$date_emprunt" rendu avant le "$date_retour" inclus."
+                    echo "- Emprunt par "$nom_emprunteur" le "$date_emprunte" rendu avant le "$date_retour" inclus."
                 fi
             fi
         fi
     done
 }
-
-# je l'ai remis c'etait pour mes tests, faut juste le supp apres
-
-delbook "mon livre"
-add_book "bible" "appotre" "50" "SF" 
-add_book "bible" "appotre" "50" "SF" 
-add_book "Mon Livre" "Moi" "2020" "SF" #marche avec debug 
-add_book "Le dispo" "Moi" "2020" "SF"
-modify_book "mon Livre" "Mon livre" "Toi" "2025" "Roman" #marche mais sensible aux espaces et a la casse donc pas ouf
-#sleep 1
-delbook "bible" 
-print_books 
-
-#searchTitle #marche mais recherche pas uniquement dans le titre (ex : pour 1984, le livre ayant le titre 1984 et le livre datant de 1984 seront affichés)
-#searchAuthor #pareil
-#searchGender #pareil
-#searchYears #pareil et ça doit rechercher les livres entre 2 années
-searchAll
-
-total_books #Marche maintenant 
-number_books_by_gender #Marche maintenant 
-top_5_authors #Marche maintenant 
-books_by_decades #Marche maintenant 
-enscript_format
-
-#emprunter_livre 
-#retourner_livre
-# Livres_Empruntes 
-# Livres_en_retard
-# Historique_emprunts

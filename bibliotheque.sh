@@ -34,7 +34,7 @@ menu_gestion_livres(){
                     while true; do
                         read -n 1 -s -r reponse
                         [ "$reponse" == 'n' ] && continu=1 && break
-                        [ "$reponse" == 'y' ] && break
+                        [ "$reponse" == 'y' ] && clear && break
                     done
                 done
                 ;;
@@ -54,7 +54,7 @@ menu_gestion_livres(){
                     while true; do
                         read -n 1 -s -r reponse
                         [ "$reponse" == 'n' ] && continu=1 && break
-                        [ "$reponse" == 'y' ] && break
+                        [ "$reponse" == 'y' ] && clear && break
                     done
                 done
                 ;;
@@ -71,7 +71,7 @@ menu_gestion_livres(){
                     while true; do
                         read -n 1 -s -r reponse
                         [ "$reponse" == 'n' ] && continu=1 && break
-                        [ "$reponse" == 'y' ] && break
+                        [ "$reponse" == 'y' ] && clear && break
                     done
                 done
                 ;;
@@ -119,7 +119,7 @@ menu_recherches_filtre(){
                     while true; do
                         read -n 1 -s -r reponse
                         [ "$reponse" == 'n' ] && continu=1 && break
-                        [ "$reponse" == 'y' ] && break
+                        [ "$reponse" == 'y' ] && clear && break
                     done
                 done
                 ;;
@@ -131,7 +131,7 @@ menu_recherches_filtre(){
                     while true; do
                         read -n 1 -s -r reponse
                         [ "$reponse" == 'n' ] && continu=1 && break
-                        [ "$reponse" == 'y' ] && break
+                        [ "$reponse" == 'y' ] && clear && break
                     done
                 done
                 ;;
@@ -143,7 +143,7 @@ menu_recherches_filtre(){
                     while true; do
                         read -n 1 -s -r reponse
                         [ "$reponse" == 'n' ] && continu=1 && break
-                        [ "$reponse" == 'y' ] && break
+                        [ "$reponse" == 'y' ] && clear && break
                     done
                 done
                 ;;
@@ -155,7 +155,7 @@ menu_recherches_filtre(){
                     while true; do
                         read -n 1 -s -r reponse
                         [ "$reponse" == 'n' ] && continu=1 && break
-                        [ "$reponse" == 'y' ] && break
+                        [ "$reponse" == 'y' ] && clear && break
                     done
                 done
                 ;;
@@ -167,7 +167,7 @@ menu_recherches_filtre(){
                     while true; do
                         read -n 1 -s -r reponse
                         [ "$reponse" == 'n' ] && continu=1 && break
-                        [ "$reponse" == 'y' ] && break
+                        [ "$reponse" == 'y' ] && clear && break
                     done
                 done
                 ;;
@@ -196,7 +196,7 @@ menu_stats(){
         echo "--- Repartition par genre ?                     taper 2 ---"
         echo "--- Le Top 5 des auteurs les plus présents ?    taper 3 ---"
         echo "--- Livres par décennie ?                       taper 4 ---"
-        echo "--- Enregistrer les resultats dans un PDF ?     taper 5 ---"
+        echo "--- Enregistrer les statistiques dans un PDF ?     taper 5 ---"
         echo "--- Retour au menu principal (q) ?              taper 6 ---"
         echo ""
         echo "============= Votre choix ? ============"
@@ -251,14 +251,27 @@ menu_stats(){
                 done
                 ;;
             5)
+                continu=0
                 enscript_format
-                sleep 10
+                echo "(q) pour quitter "
+                while [ "$continu" != 1 ]; do
+                    read -n 1 -s -r reponse
+                    if [ "$reponse" == 'q' ]; then
+                        continu=1
+                    fi
+                done
                 ;;
             6)
+                if [ -f authors.txt ] || [ -f books_by_decades.txt ] || [ -f books_by_gender.txt ] || [ -f total.txt ]; then
+                    rm authors.txt books_by_decades.txt books_by_gender.txt total.txt
+                fi
                 rep=1 
                 ;;
             q)
-                rep=1
+                if [ -f authors.txt ] || [ -f books_by_decades.txt ] || [ -f books_by_gender.txt ] || [ -f total.txt ]; then
+                    rm authors.txt books_by_decades.txt books_by_gender.txt total.txt
+                fi
+                rep=1 
                 ;;
             *)
                 :
@@ -288,15 +301,29 @@ menu_emprunts(){
 
         case "$choix" in
             1)
-                emprunter_livre
-                sleep 2
+                continu=0
+                while [ "$continu" != 1 ]; do
+                    emprunter_livre
+                    echo "Voulez-vous enregister un autre emprunt ? : (y/n) "
+                    while true; do
+                        read -n 1 -s -r reponse
+                        [ "$reponse" == 'n' ] && continu=1 && break
+                        [ "$reponse" == 'y' ] && clear && break
+                    done
+                done
                 ;;
-
             2)
-                retourner_livre
-                sleep 2
+                continu=0
+                while [ "$continu" != 1 ]; do
+                    retourner_livre
+                    echo "Voulez-vous enregister un autre retour ? : (y/n) "
+                    while true; do
+                        read -n 1 -s -r reponse
+                        [ "$reponse" == 'n' ] && continu=1 && break
+                        [ "$reponse" == 'y' ] && clear && break
+                    done
+                done
                 ;;
-
             3)
                 continu=0
                 Livres_Empruntes
@@ -327,7 +354,7 @@ menu_emprunts(){
                     while true; do
                         read -n 1 -s -r reponse
                         [ "$reponse" == 'n' ] && continu=1 && break
-                        [ "$reponse" == 'y' ] && break
+                        [ "$reponse" == 'y' ] && clear && break
                     done
                 done
                 ;;

@@ -1,9 +1,0 @@
-<<<<<<< HEAD
-Moi : 3 livre(s)
-=======
-Moi : 2 livre(s)
->>>>>>> 688770d9be4d5517fb662878423c578bb315dc0e
-Albert Camus : 2 livre(s)
-William Shakespeare : 1 livre(s)
-Victor Hugo : 1 livre(s)
-Stendhal : 1 livre(s)
