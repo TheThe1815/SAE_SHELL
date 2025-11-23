@@ -7,4 +7,7 @@ Roman : 4
 Romance : 1
 SF : 2
 Théâtre : 1
+<<<<<<< HEAD
 covid : 1
+=======
+>>>>>>> 688770d9be4d5517fb662878423c578bb315dc0e

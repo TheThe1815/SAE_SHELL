@@ -301,7 +301,7 @@ total_books() {
     echo "" 
 }
 
-# 2. Par Genre (Avec ton super graphique en barres #)
+# Affiche le nombre de livre par genre
 number_books_by_gender() {
     echo "--- Par Genre ---"
     if [ ! -f "books.csv" ]; then echo "Fichier introuvable"; return; fi
@@ -318,7 +318,7 @@ number_books_by_gender() {
     done
 }
 
-# 3. Top 5 Auteurs
+# Affiche les 5 auteurs les plus présent
 top_5_authors() {
     echo "--- Top 5 Auteurs ---"
     if [ ! -f "books.csv" ]; then echo "Fichier introuvable"; return; fi
@@ -334,7 +334,7 @@ top_5_authors() {
     done
 }
 
-# 4. Par Décennies
+# Affiche les livres par décennie
 books_by_decades() {
     echo "--- Par Décennies ---"
     if [ ! -f "books.csv" ]; then echo "Fichier introuvable"; return; fi
@@ -356,7 +356,31 @@ books_by_decades() {
     rm decadesTmp.txt
 }
 
+# Installer enscript et ghostscript sur votre pc
+installer_enscript() {
+    echo "🔍 Vérification des dépendances..."
+
+    if ! command -v enscript &> /dev/null; then
+        echo "⚠️  'enscript' est manquant. Installation..."
+        sudo apt-get update && sudo apt-get install -y enscript
+    else
+        echo "✅  'enscript' est déjà installé."
+    fi
+
+    if ! command -v ps2pdf &> /dev/null; then
+        echo "⚠️  'ps2pdf' (ghostscript) est manquant. Installation..."
+        sudo apt-get install -y ghostscript
+    else
+        echo "✅  'ps2pdf' est déjà installé."
+    fi
+    
+    echo "--- Prêt à travailler ---"
+    echo ""
+}
+
+# Prend les informations et les transforme en un rapport sous format pdf
 enscript_format() {
+    installer_enscript
     echo "Génération du PDF..."
 
     local TITRE=$(echo "Rapport Complet Bibliothèque" | iconv -f UTF-8 -t ISO-8859-1//TRANSLIT)

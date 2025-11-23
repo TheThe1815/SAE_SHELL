@@ -38,7 +38,6 @@ menu_gestion_livres(){
                     done
                 done
                 ;;
-
             2) 
                 clear
                 continu=0
@@ -76,7 +75,6 @@ menu_gestion_livres(){
                     done
                 done
                 ;;
-
             4)
                 print_books 
                 ;;
