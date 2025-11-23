@@ -198,7 +198,8 @@ menu_stats(){
         echo "--- Repartition par genre ?                     taper 2 ---"
         echo "--- Le Top 5 des auteurs les plus présents ?    taper 3 ---"
         echo "--- Livres par décennie ?                       taper 4 ---"
-        echo "--- Retour au menu principal (q) ?              taper 5 ---"
+        echo "--- Enregistrer les resultats dans un PDF ?     taper 5 ---"
+        echo "--- Retour au menu principal (q) ?              taper 6 ---"
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
@@ -252,6 +253,10 @@ menu_stats(){
                 done
                 ;;
             5)
+                enscript_format
+                sleep 10
+                ;;
+            6)
                 rep=1 
                 ;;
             q)
