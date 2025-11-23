@@ -12,11 +12,7 @@ menu_gestion_livres(){
         echo "--- Modifier un livre ?           taper 2 ---"
         echo "--- Supprimer un livre ?          taper 3 ---"
         echo "--- Lister des livres ?           taper 4 ---"
-<<<<<<< HEAD
         echo "--- Retour au menu principal (q)? "
-=======
-        echo "--- Retour au menu principal ?    taper q ---"
->>>>>>> cacb6d50096e325ca2a1fe6aba1f475638a815c9
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
@@ -82,11 +78,7 @@ menu_gestion_livres(){
             4)
                 print_books 
                 ;;
-<<<<<<< HEAD
             q | Q)
-=======
-            q)
->>>>>>> cacb6d50096e325ca2a1fe6aba1f475638a815c9
                 rep=1 
                 ;;
 
@@ -109,11 +101,7 @@ menu_recherches_filtre(){
         echo "--- Recherche par genre ?           taper 3 ---"
         echo "--- Recherche par année ?           taper 4 ---"
         echo "--- Recherche avancée ?             taper 5 ---"
-<<<<<<< HEAD
         echo "--- Retour au menu principal (q) ?  "
-=======
-        echo "--- Retour au menu principal ?      taper q ---"
->>>>>>> cacb6d50096e325ca2a1fe6aba1f475638a815c9
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
@@ -180,11 +168,7 @@ menu_recherches_filtre(){
                     done
                 done
                 ;;
-<<<<<<< HEAD
             q | Q) 
-=======
-            q) 
->>>>>>> cacb6d50096e325ca2a1fe6aba1f475638a815c9
                 rep=1 
                 ;;
             *) 
@@ -206,13 +190,8 @@ menu_stats(){
         echo "--- Repartition par genre ?                     taper 2 ---"
         echo "--- Le Top 5 des auteurs les plus présents ?    taper 3 ---"
         echo "--- Livres par décennie ?                       taper 4 ---"
-<<<<<<< HEAD
-        echo "--- Enregistrer les resultats dans un PDF ?     taper 5 ---"
-        echo "--- Retour au menu principal (q) ?              "
-=======
         echo "--- Enregistrer les statistiques dans un PDF ?  taper 5 ---"
-        echo "--- Retour au menu principal ?                  taper q ---"
->>>>>>> cacb6d50096e325ca2a1fe6aba1f475638a815c9
+        echo "--- Retour au menu principal (q) ?              "
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
@@ -268,13 +247,6 @@ menu_stats(){
             5)
                 continu=0
                 enscript_format
-<<<<<<< HEAD
-                sleep 10
-                ;;
-            q | Q)
-                rep=1 
-                ;;
-=======
                 echo "(q) pour quitter "
                 while [ "$continu" != 1 ]; do
                     read -n 1 -s -r reponse
@@ -283,13 +255,12 @@ menu_stats(){
                     fi
                 done
                 ;;
-            q)
+            q | Q)
                 if [ -f authors.txt ] || [ -f books_by_decades.txt ] || [ -f books_by_gender.txt ] || [ -f total.txt ]; then
                     rm authors.txt books_by_decades.txt books_by_gender.txt total.txt
                 fi
                 rep=1 
                 ;;
->>>>>>> cacb6d50096e325ca2a1fe6aba1f475638a815c9
             *)
                 :
                 ;;
@@ -309,11 +280,7 @@ menu_emprunts(){
         echo "--- Lister les livres empruntés ?     taper 3 ---"
         echo "--- Lister les livres en retard ?     taper 4 ---"
         echo "--- Historique des emprunts ?         taper 5 ---"
-<<<<<<< HEAD
         echo "--- Retour au menu principal (q) ?    "
-=======
-        echo "--- Retour au menu principal ?        taper q ---"
->>>>>>> cacb6d50096e325ca2a1fe6aba1f475638a815c9
         echo ""
         echo "============= Votre choix ? ============"
         echo ""
@@ -379,11 +346,7 @@ menu_emprunts(){
                     done
                 done
                 ;;
-<<<<<<< HEAD
             q | Q)
-=======
-            q)
->>>>>>> cacb6d50096e325ca2a1fe6aba1f475638a815c9
                 rep=1 
                 ;;
             *)
@@ -405,11 +368,7 @@ while [ "$quitter" != 1 ]; do
     echo " Recherche et filtres :   tapez 2"
     echo " Statistiques :           tapez 3"
     echo " Emprunts :               tapez 4"
-<<<<<<< HEAD
     echo " Quittez (q) :            "
-=======
-    echo " Quittez :                tapez q"
->>>>>>> cacb6d50096e325ca2a1fe6aba1f475638a815c9
     if alerteLivreRetard; then #Si la condition est une fonction pas de []
         echo "==================================================="
         echo "Attention il y a du retard dans les emprunts"
@@ -431,11 +390,7 @@ while [ "$quitter" != 1 ]; do
         4)
             menu_emprunts 
             ;;
-<<<<<<< HEAD
         q | Q)
-=======
-        q)
->>>>>>> cacb6d50096e325ca2a1fe6aba1f475638a815c9
             quitter=1 
             ;;    
         *)
