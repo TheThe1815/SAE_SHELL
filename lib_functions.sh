@@ -48,9 +48,23 @@ modify_book() {
     local nstatut="$6"
 
     # Vérifie que le livre existe
-    if ! grep -qi ",$titre," books.csv; then
+    if  ! grep -iq "$titre," books.csv; then
         echo "Erreur : Livre '$titre' non trouvé."
         return  1
+    fi
+
+    # Verifire que ntitre n'existe pas
+    if grep -iq ",$ntitre," books.csv; then
+        echo "Livre deja existant"
+        return  1
+    fi
+
+    #Verifie que l'annee existe est que si elle existe ell est correcte
+    if [ ! -z "$nannee" ] ;then
+        if ! [[ "$nannee" =~ ^[0-9]{1,4}$ ]] || [ "$nannee" -gt "$(date +%Y)" ]; then
+            echo "Erreur : L'année n'est pas valide."
+            return  1
+        fi
     fi
 
     # Récupère les informations actuelles du livre
