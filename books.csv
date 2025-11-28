@@ -1,6 +1,5 @@
 ID,Titre,Auteur,Année,Genre,Statut
-1,La Peste,p,2027,t,disponible
-2,Les travailleurs de la mer,Victor Hugo,1866,Roman,disponible
+1,Le Petit Prince,Antoine de Saint-Exupéry,1943,Conte,disponible
 3,1984,George Orwell,1949,Dystopie,emprunté
 4,La Peste,Albert Camus,1947,Roman,emprunté
 5,Hamlet,William Shakespeare,1603,Théâtre,emprunté
@@ -19,4 +18,3 @@ ID,Titre,Auteur,Année,Genre,Statut
 18,Le Parfum,Patrick Süskind,1985,Thriller,disponible
 19,Le Livre de ma mère,Albert Cohen,1954,Autobiographie,emprunté
 20,Le Joueur d'échecs,Stefan Zweig,1943,Nouvelle,disponible
-21,Star Wars,Lucas Film,1999,SF,disponible

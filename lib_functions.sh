@@ -53,7 +53,7 @@ modify_book() {
         return  1
     fi
 
-    # Verifire que ntitre n'existe pas
+    # Verifier que ntitre n'existe pas
     if grep -iq ",$ntitre," books.csv; then
         echo "Livre deja existant"
         return  1
